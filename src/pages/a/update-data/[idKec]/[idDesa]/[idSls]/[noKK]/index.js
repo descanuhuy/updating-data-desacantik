@@ -37,10 +37,10 @@ const getKeluargas = async (noKK) => {
 
   try {
     const res = await axios(requestOptions);
-    // console.log(res);
+
     return res.data.list;
   } catch (err) {
-    console.error(err);
+
     return [];
   }
 };
@@ -61,14 +61,12 @@ function DataKeluarga() {
 
   const [openEditModal, setOpenEditModal] = useState(false);
   const handleOpenEdit = () => setOpenEditModal(true);
-  const handleCloseEdit = () => {
-    setOpenEditModal(false);
-  }
-
+  const handleCloseEdit = () => setOpenEditModal(false);
+  
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Add submit logic here
     handleClose();
+
   };
 
 
@@ -79,13 +77,13 @@ function DataKeluarga() {
   };
 
   useEffect(() => {
+
     const fetchData = async () => {
       const { noKK } = router.query;
       setNoKK(noKK);
       if (noKK) {
         const result = await getKeluargas(noKK);
         setData(result);
-        // console.log(result);
         setLoading(false);
       }
     };
@@ -110,7 +108,6 @@ function DataKeluarga() {
   };
 
   return (
-
     <div>
       <Box sx={{ width: '100%', typography: 'body1' }}>
         <TabContext value={value}>

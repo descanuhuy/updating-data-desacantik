@@ -13,8 +13,8 @@ function DaftarSls() {
   const router = useRouter();
 
   const handleAction = (kodeDesa, kodeKec, kodeSls) => {
+
     router.push(`/a/update-data/${kodeKec}/${kodeDesa}/${kodeSls}`);
-    // console.log(`Kode Desa: ${kodeDesa}`);
   };
 
   const columns = [
@@ -30,6 +30,7 @@ function DaftarSls() {
           const kodeSls = tableMeta.rowData[0]; 
           const kodeKec = router.query.idKec;
           const kodeDesa = router.query.idDesa;
+
           return (
             <Button variant="outlined" onClick={() => handleAction(kodeDesa, kodeKec, kodeSls)}>
             Pilih
@@ -59,19 +60,22 @@ const getSls = async (id_desa) => {
 
   try {
     const res = await axios(options);
-    
+
     return res.data.list;
   } catch (err) {
-    console.error(err);
+  
     return [];
   }
 }
 
   useEffect(() => {
+    
     const fetchData = async () => {
+
       const { idDesa } = router.query;
       if (idDesa) {
         const result = await getSls(idDesa);
+        
         const transformedData = result.map(item => [
           item.kode_sls,
           item.nama_sls,

@@ -46,11 +46,12 @@ export default async function handler(req, res) {
 
       return res.status(200).json({ message: "Berhasil masuk", token, username: user[0].username, role: user[0].role });
     } catch (error) {
-      console.error(error);
+   
       return res.status(500).json({ message: 'Internal server error' });
     }
   } else {
     res.setHeader('Allow', ['POST']);
+    
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }

@@ -93,6 +93,7 @@ const LoginPage = () => {
     setLoading(true);
     setErrorUname(false);
     setErrorPass(false);
+
     const res = await fetch('/api/login', {
       method: 'POST',
       headers: {
@@ -137,7 +138,7 @@ const LoginPage = () => {
           alignItems="center"
           justifyContent="center"
           sx={{marginBottom: 10}}
-          // height="100vh" // Optional: This makes the Box full height of the viewport
+          
         >
           <Image
             src="/images/logos/dc.png"

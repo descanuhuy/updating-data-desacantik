@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react'
 
 import Box from '@mui/material/Box'
@@ -13,8 +12,6 @@ import Grid from '@mui/material/Grid'
 import axios from 'axios'
 import KecamatanCard from 'src/layouts/components/card/kecamatanCard'
 
-
-
 const getKecamatans = async () => {
   const options = {
     method: 'GET',
@@ -26,6 +23,7 @@ const getKecamatans = async () => {
 
   try {
     const res = await axios(options)
+    
     return res.data
   } catch (err) {
     console.error(err)
@@ -46,7 +44,7 @@ function UpdateData() {
     const fetchData = async () => {
       const result = await getKecamatans()
       setData(result.list)
-   
+      
       setLoading(false)
     }
 
@@ -58,14 +56,10 @@ function UpdateData() {
   }
 
   return (
-
     <Grid container spacing={6}>
-        {data.map((item, index) => (
+      {data.map((item, index) => (
         <KecamatanCard key={index} data={item} />
       ))}
-      {/* <KecamatanCard data={data} /> */}
-      
-      
     </Grid>
   )
 }

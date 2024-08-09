@@ -14,8 +14,8 @@ function DataPendudukSls() {
   const router = useRouter();
 
   const handleAction = (kodeDesa, kodeKec, kodeSls, noKK) => {
+
     router.push(`/a/update-data/${kodeKec}/${kodeDesa}/${kodeSls}/${noKK}`);
-    // console.log(`Kode Desa: ${kodeDesa}`);
   };
 
   const columns = [
@@ -62,9 +62,10 @@ function DataPendudukSls() {
   
     try {
       const res = await axios(requestOptions);
+
       return res.data.list;
     } catch (err) {
-      console.error(err);
+
       return [];
     }
   }
@@ -73,7 +74,9 @@ function DataPendudukSls() {
     const fetchData = async () => {
       const { idDesa, idKec, idSls } = router.query;
       if (idDesa && idKec && idSls) {
+
         const result = await getPendudukSls(idDesa, idKec, idSls);
+        
         const transformedData = result.map(item => [
           item.nama_sls,
           item.nomor_kk,

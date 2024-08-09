@@ -10,8 +10,8 @@ function DaftarDesa() {
   const router = useRouter();
 
   const handleAction = (kodeDesa, kodeKec) => {
+
     router.push(`/a/update-data/${kodeKec}/${kodeDesa}`);
-    // console.log(`Kode Desa: ${kodeDesa}`);
   };
 
   const columns = [
@@ -25,7 +25,8 @@ function DaftarDesa() {
         sort: false,
         customBodyRender: (value, tableMeta, updateValue) => {
           const kodeKec = tableMeta.rowData[0]; 
-          const kodeDesa = tableMeta.rowData[1]; 
+          const kodeDesa = tableMeta.rowData[1];
+
           return (
             <Button variant="outlined" onClick={() => handleAction(kodeDesa, kodeKec)}>
               Pilih
@@ -54,18 +55,24 @@ function DaftarDesa() {
 
     try {
       const res = await axios(options);
+
       return res.data.list;
     } catch (err) {
       console.error(err);
+
       return [];
     }
   }
 
   useEffect(() => {
+
     const fetchData = async () => {
+
       const { idKec } = router.query;
       if (idKec) {
+
         const result = await getDesas(idKec);
+
         const transformedData = result.map(item => [
           item.kode_kec,
           item.kode_desa,
