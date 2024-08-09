@@ -117,7 +117,7 @@ function DataKeluarga() {
             Tambah
           </Button>
 
-          <Button onClick={() => window.location.reload()} variant="contained" sx={{mb:3}} startIcon={<Sync />}>
+          <Button onClick={() => location.reload()} variant="contained" sx={{mb:3}} startIcon={<Sync />}>
             Sync Data
           </Button>
           </Box>

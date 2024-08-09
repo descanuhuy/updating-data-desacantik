@@ -11,7 +11,7 @@ function DaftarDesa() {
 
   const handleAction = (kodeDesa, kodeKec) => {
 
-    router.push(`/a/update-data/${kodeKec}/${kodeDesa}`);
+    router.push(`/admin/update-data/${kodeKec}/${kodeDesa}`);
   };
 
   const columns = [

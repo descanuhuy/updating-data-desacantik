@@ -14,7 +14,7 @@ function DaftarSls() {
 
   const handleAction = (kodeDesa, kodeKec, kodeSls) => {
 
-    router.push(`/a/update-data/${kodeKec}/${kodeDesa}/${kodeSls}`);
+    router.push(`/admin/update-data/${kodeKec}/${kodeDesa}/${kodeSls}`);
   };
 
   const columns = [

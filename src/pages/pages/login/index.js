@@ -118,7 +118,7 @@ const LoginPage = () => {
     }
 
     if (res.status === 200) {
-      router.push('/a/dashboard'); 
+      router.push('/admin/dashboard'); 
       setLoading(false);
       localStorage.setItem('username', data.username);
       localStorage.setItem('role', data.role);

@@ -4,7 +4,7 @@ export default function middleware(req) {
 
 
   const token = req.cookies.token_desacantik;
-  if((req.nextUrl.href.startsWith('/a')) && (!token)) {
+  if((req.nextUrl.href.startsWith('/admin')) && (!token)) {
     return NextResponse.redirect('/pages/login');
 
   }

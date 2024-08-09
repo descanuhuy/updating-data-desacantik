@@ -15,7 +15,7 @@ function DataPendudukSls() {
 
   const handleAction = (kodeDesa, kodeKec, kodeSls, noKK) => {
 
-    router.push(`/a/update-data/${kodeKec}/${kodeDesa}/${kodeSls}/${noKK}`);
+    router.push(`/admin/update-data/${kodeKec}/${kodeDesa}/${kodeSls}/${noKK}`);
   };
 
   const columns = [

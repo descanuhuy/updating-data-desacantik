@@ -15,7 +15,7 @@ const navigation = () => {
     {
       title: 'Dashboard',
       icon: HomeOutline,
-      path: '/a/dashboard'
+      path: '/admin/dashboard'
     },
     // {
     //   title: 'Account Settings',
@@ -28,7 +28,7 @@ const navigation = () => {
     {
       title: 'Update Data',
       icon: Table,
-      path: '/a/update-data',
+      path: '/admin/update-data',
     },
    
     // {
