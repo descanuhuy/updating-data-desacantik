@@ -75,7 +75,7 @@ const KoorDesaCard = () => {
         }
         subheader={
           <Typography variant='body2'>
-            DESA PEKEWUH
+            DESA PEKEWUH  
             {/* <Box component='span' sx={{ fontWeight: 600, color: 'text.primary' }}>
               Total 48.5% growth
             </Box>{' '}
