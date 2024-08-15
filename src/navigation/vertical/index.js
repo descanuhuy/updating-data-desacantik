@@ -9,6 +9,7 @@ import CreditCardOutline from 'mdi-material-ui/CreditCardOutline'
 import AccountPlusOutline from 'mdi-material-ui/AccountPlusOutline'
 import AlertCircleOutline from 'mdi-material-ui/AlertCircleOutline'
 import GoogleCirclesExtended from 'mdi-material-ui/GoogleCirclesExtended'
+import { ChartArc, ChartBar, Graph, LineScan } from 'mdi-material-ui'
 
 const navigation = () => {
   return [
@@ -29,6 +30,11 @@ const navigation = () => {
       title: 'Update Data',
       icon: Table,
       path: '/admin/update-data',
+    },
+    {
+      title: 'Statistik',
+      icon: ChartBar,
+      path: '/admin/statistik',
     },
    
     // {

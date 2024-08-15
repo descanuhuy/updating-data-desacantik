@@ -121,7 +121,7 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
 
     try {
       const res = await axios(requestOptions);
-      // console.log(res.data);
+      console.log(res.data);
         setLoading(false);
         setSnackBar(true);
         setTimeout(() => {
