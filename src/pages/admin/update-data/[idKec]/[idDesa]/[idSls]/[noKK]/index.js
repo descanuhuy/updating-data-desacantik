@@ -26,7 +26,7 @@ import ModalEditAnggota from 'src/layouts/components/modal/editDataAnggota';
 const getKeluargas = async (noKK) => {
   const requestOptions = {
     method: 'GET',
-    url: 'https://db.bpstuban.my.id/api/v2/tables/me1snqf4cn07esw/records',
+    url: process.env.NEXT_PUBLIC_NOCO_PDDK_API,
     headers: {
       'xc-token': process.env.NEXT_PUBLIC_XC_TOKEN,
     },
@@ -155,7 +155,7 @@ function DataKeluarga() {
                               fullWidth
                               type='text'
                               label='NIK'
-                              value={item.nik}
+                              value={item.NIK}
                               
                             />
                           </Grid>
@@ -173,7 +173,7 @@ function DataKeluarga() {
                             <TextField
                               fullWidth
                               label='Nama Lengkap'
-                              value={item.nama_lengkap}
+                              value={item.nama_pddk}
                              
                             />
                          
@@ -215,7 +215,7 @@ function DataKeluarga() {
                             <TextField
                               fullWidth
                               label='Agama'
-                              value={item.agama}
+                              value={item.Agama}
                              
                             />
                          
@@ -225,7 +225,7 @@ function DataKeluarga() {
                             <TextField
                               fullWidth
                               label='Pendidikan'
-                              value={item.pendidikan}
+                              value={item.Pendidikan}
                              
                             />
                          
@@ -235,7 +235,7 @@ function DataKeluarga() {
                             <TextField
                               fullWidth
                               label='Jenis Pekerjaan'
-                              value={item.jenis_pekerjaan}
+                              value={item.Pekerjaan}
                              
                             />
                          
@@ -245,7 +245,7 @@ function DataKeluarga() {
                             <TextField
                               fullWidth
                               label='Status Perkawinan'
-                              value={item.status_perkawinan}
+                              value={item.status_kawin}
                              
                             />
                          
@@ -255,7 +255,7 @@ function DataKeluarga() {
                             <TextField
                               fullWidth
                               label='Status Hubungan Keluarga'
-                              value={item.status_hub_keluarga}
+                              value={item.SHDK}
                              
                             />
                          
@@ -264,38 +264,20 @@ function DataKeluarga() {
                           <Grid item xs={12} md={4}>
                             <TextField
                               fullWidth
-                              label='Kewarganegaraan'
-                              value={item.kewarganegaraan}
+                              label='Gol. Darah'
+                              value={item.gol_darah !== 'Tdk Th' ? item.no_paspor : '-'}
                              
                             />
                          
                           </Grid>
 
-                          <Grid item xs={12} md={6}>
-                            <TextField
-                              fullWidth
-                              label='No. Paspor'
-                              value={item.no_paspor ? item.no_paspor : '-'}
-                             
-                            />
-                         
-                          </Grid>
-
-                          <Grid item xs={12} md={6}>
-                            <TextField
-                              fullWidth
-                              label='No. Kitas'
-                              value={item.no_kitas_kitab ? item.no_kitas_kitab : '-'}
-                             
-                            />
-                         
-                          </Grid>
+                        
 
                           <Grid item xs={12} md={6}>
                             <TextField
                               fullWidth
                               label='Ayah'
-                              value={item.ayah}
+                              value={item.Ayah}
                              
                             />
                          
@@ -306,11 +288,33 @@ function DataKeluarga() {
                             <TextField
                               fullWidth
                               label='Ibu'
-                              value={item.ibu}
+                              value={item.Ibu}
                              
                             />
                          
                           </Grid>
+
+                          <Grid item xs={12} md={12}>
+                            <TextField
+                              fullWidth
+                              label='Status'
+                              value={item.status ? item.status : '-'}
+                             
+                            />
+                         
+                          </Grid>
+
+                         
+
+                          {/* <Grid item xs={12} md={6}>
+                            <TextField
+                              fullWidth
+                              label='Cacat'
+                              value={item.cacat ? item.no_kitas_kitab : '-'}
+                             
+                            />
+                         
+                          </Grid> */}
 
                           <Grid container item xs={12}>
                             <Button fullWidth onClick={handleOpenEdit} variant="contained" startIcon={<NoteEdit />}>

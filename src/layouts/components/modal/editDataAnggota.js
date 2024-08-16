@@ -30,27 +30,27 @@ const style = {
 const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
   const [formData, setFormData] = useState({
     noKK: dataAnggota.nomor_kk,
-    nik: dataAnggota.nik,
+    nik: dataAnggota.NIK,
     jk: dataAnggota.jk,
-    statusKawin: dataAnggota.status_perkawinan,
-    statusHub: dataAnggota.status_hub_keluarga,
-    agama: dataAnggota.agama,
-    pendidikan: dataAnggota.pendidikan,
+    statusKawin: dataAnggota.status_kawin,
+    statusHub: dataAnggota.SHDK,
+    agama: dataAnggota.Agama,
+    pendidikan: dataAnggota.Pendidikan,
     namaKepalaKeluarga: dataAnggota.nama_kk,
-    namaLengkap: dataAnggota.nama_lengkap,
+    namaLengkap: dataAnggota.nama_pddk,
     tempatLahir: dataAnggota.tempat_lahir,
-    pekerjaan: dataAnggota.jenis_pekerjaan,
+    pekerjaan: dataAnggota.Pekerjaan,
     tanggalLahir: dayjs(dataAnggota.tgl_lahir),
-    kewarganegaraan: dataAnggota.kewarganegaraan,
-    noPaspor: dataAnggota.no_paspor,
-    noKitas: dataAnggota.no_kitas_kitab,
-    ayah: dataAnggota.ayah,
-    ibu: dataAnggota.ibu,
+    gol_darah: dataAnggota.gol_darah,
+    status: dataAnggota.status,
+    cacat: dataAnggota.Cacat,
+    ayah: dataAnggota.Ayah,
+    ibu: dataAnggota.Ibu,
   });
 
   const statusKawinList = ['Belum Kawin', 'Kawin', 'Cerai Hidup', 'Cerai Mati'];
-  const jkList = ['Laki-laki', 'Perempuan'];
-  const statusHubList = ['Kepala Keluarga', 'Istri', 'Anak', 'Menantu', 'Cucu', 'Mertua', 'Orangtua'];
+  const jkList = ['Laki-Laki', 'Perempuan'];
+  const statusHubList = ['Kepala Keluarga', 'Istri', 'Anak', 'Menantu', 'Cucu', 'Mertua', 'Orang Tua', 'Famili Lain', 'Lainnya'];
   const pendidikanList = [
     'Tidak/Belum Sekolah', 'Belum Tamat SD/Sederajat', 'Tamat SD/Sederajat', 
     'SLTP/Sederajat', 'SLTA/Sederajat', 'Diploma I/II', 
@@ -69,8 +69,17 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
     "Kepala Desa", "Dokter", "Dosen", "Pendeta", "Seniman", "Ustadz/Mubaligh", 
     "Bidan", "Pembantu Rumah Tangga", "Notaris"
   ];
+
+  const statusPddk = [
+    "Ada",
+    "Tidak ada, Meninggal",
+    "Tidak ada, Pindah",
+    "Tidak, ada, Pecah KK",
+  ]
+
   const [loading, setLoading] = useState(false);
   const [snackBar, setSnackBar] = useState(false);
+  const [sttsPddk, setSttsPddk] = useState('');
 
   dayjs.locale('id');
 
@@ -89,7 +98,7 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
     setLoading(true);
     const requestOptions = {
       method: 'PATCH',
-      url: 'https://db.bpstuban.my.id/api/v2/tables/me1snqf4cn07esw/records',
+      url: process.env.NEXT_PUBLIC_NOCO_PDDK_API,
       headers: {
         'xc-token': process.env.NEXT_PUBLIC_XC_TOKEN,
         'Content-Type': 'application/json'
@@ -98,22 +107,22 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
         {
           Id: dataAnggota.Id,
           nomor_kk: formData.noKK,
-          nik: formData.nik,
+          NIK: formData.nik,
           nama_kk: formData.namaKepalaKeluarga,
-          nama_lengkap: formData.namaLengkap,
+          nama_pddk: formData.namaLengkap,
           jk: formData.jk,
           tempat_lahir: formData.tempatLahir,
           tgl_lahir: formData.tanggalLahir.format('YYYY-MM-DD'),
-          agama: formData.agama,
-          pendidikan: formData.pendidikan,
-          jenis_pekerjaan: formData.pekerjaan,
-          status_perkawinan: formData.statusKawin,
-          status_hub_keluarga: formData.statusHub,
-          kewarganegaraan: formData.kewarganegaraan,
-          no_paspor: formData.noPaspor,
-          no_kitas_kitab: formData.noKitas,
-          ayah: formData.ayah,
-          ibu: formData.ibu
+          Agama: formData.agama,
+          Pendidikan: formData.pendidikan,
+          Pekerjaan: formData.pekerjaan,
+          status_kawin: formData.statusKawin,
+          SHDK: formData.statusHub,
+          gol_darah: formData.gol_darah,
+          status: formData.status,
+          Cacat: formData.cacat,
+          Ayah: formData.ayah,
+          Ibu: formData.ibu
         }
       ]
       
@@ -121,7 +130,6 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
 
     try {
       const res = await axios(requestOptions);
-      console.log(res.data);
         setLoading(false);
         setSnackBar(true);
         setTimeout(() => {
@@ -314,31 +322,14 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label='Kewarganegaraan'
-                name="kewarganegaraan"
-                value={formData.kewarganegaraan}
+                label='Gol. Darah'
+                name="gol_darah"
+                value={formData.gol_darah}
                 onChange={handleChange}
                 
               />
             </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label='No Paspor'
-                name="noPaspor"
-                value={formData.noPaspor}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label='No Kitas'
-                name="noKitas"
-                value={formData.noKitas}
-                onChange={handleChange}
-              />
-            </Grid>
+
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
@@ -357,6 +348,34 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
                 onChange={handleChange}
               />
             </Grid>
+
+
+            <Grid item xs={12} md={12}>
+              <FormControl fullWidth>
+                <InputLabel id="status-pddk">Status Penduduk</InputLabel>
+                <Select
+                  labelId="status-pddk"
+                  id="status-pddk-select"
+                  value={sttsPddk}
+                  label="Status Penduduk"
+                  onChange={(e) => setSttsPddk(e.target.value)}
+                >
+                  {statusPddk.map((item, index) => (
+                    <MenuItem key={index} value={item}>{item}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            {/* <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label='No Kitas'
+                name="noKitas"
+                value={formData.noKitas}
+                onChange={handleChange}
+              />
+            </Grid> */}
+            
             <Grid item xs={12} md={12}>
               {
                 loading ? (<LoadingButton

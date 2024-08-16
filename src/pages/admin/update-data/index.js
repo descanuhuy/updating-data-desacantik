@@ -15,7 +15,7 @@ import KecamatanCard from 'src/layouts/components/card/kecamatanCard'
 const getKecamatans = async () => {
   const options = {
     method: 'GET',
-    url: 'https://db.bpstuban.my.id/api/v2/tables/mk3l0tnuzfhtg0a/records',
+    url: process.env.NEXT_PUBLIC_NOCO_KEC_API,
     headers: {
       'xc-token': process.env.NEXT_PUBLIC_XC_TOKEN
     }

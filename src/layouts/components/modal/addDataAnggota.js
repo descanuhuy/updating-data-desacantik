@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Autocomplete, Box, Button, Grid, IconButton, Modal, TextField, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Alert, Autocomplete, Box, Button, Grid, IconButton, Modal, TextField, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -10,6 +10,8 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import axios from 'axios';
+import { LoadingButton } from '@mui/lab';
+import { Check } from 'mdi-material-ui';
 
 const style = {
   position: 'absolute',
@@ -30,7 +32,13 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
   const [jk, setJk] = useState('');
   const [statusHub, setStatusHub] = useState('');
   const [pendidikan, setPendidikan] = useState('');
+  const [sttsPddk, setSttsPddk] = useState('');
   const [agama, setAgama] = useState('');
+  const [region, setRegion] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [snackBar, setSnackBar] = useState(false);
+
+
   const [formData, setFormData] = useState({
     noKK: noKK,
     nik: '',
@@ -38,16 +46,16 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
     namaLengkap: '',
     tempatLahir: '',
     tanggalLahir: dayjs(),
-    kewarganegaraan: '',
-    noPaspor: '',
-    noKitas: '',
+    gol_darah: '',
+    status: '',
+    // cacat: '',
     ayah: '',
     ibu: ''
   });
 
   const statusKawinList = ['Belum Kawin', 'Kawin', 'Cerai Hidup', 'Cerai Mati'];
-  const jkList = ['Laki-laki', 'Perempuan'];
-  const statusHubList = ['Kepala Keluarga', 'Istri', 'Anak', 'Menantu', 'Cucu', 'Mertua', 'Orangtua'];
+  const jkList = ['Laki-Laki', 'Perempuan'];
+  const statusHubList = ['Kepala Keluarga', 'Istri', 'Anak', 'Menantu', 'Cucu', 'Mertua', 'Orang Tua', 'Famili Lain', 'Lainnya'];
   const pendidikanList = [
     'Tidak/Belum Sekolah', 'Belum Tamat SD/Sederajat', 'Tamat SD/Sederajat', 
     'SLTP/Sederajat', 'SLTA/Sederajat', 'Diploma I/II', 
@@ -67,6 +75,13 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
     "Bidan", "Pembantu Rumah Tangga", "Notaris"
   ];
 
+  const statusPddk = [
+    "Ada",
+    "Tidak ada, Meninggal",
+    "Tidak ada, Pindah",
+    "Tidak, ada, Pecah KK",
+  ]
+
 
   dayjs.locale('id');
 
@@ -81,9 +96,10 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const requestOptions = {
       method: 'POST',
-      url: 'https://db.bpstuban.my.id/api/v2/tables/me1snqf4cn07esw/records',
+      url: process.env.NEXT_PUBLIC_NOCO_PDDK_API,
       headers: {
         'xc-token': process.env.NEXT_PUBLIC_XC_TOKEN,
         'Content-Type': 'application/json'
@@ -91,22 +107,22 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
       data: [
         {
           nomor_kk: formData.noKK,
-          nik: formData.nik,
+          NIK: formData.nik,
           nama_kk: formData.namaKepalaKeluarga,
-          nama_lengkap: formData.namaLengkap,
+          nama_pddk: formData.namaLengkap,
           jk: jk,
           tempat_lahir: formData.tempatLahir,
           tgl_lahir: formData.tanggalLahir.format('YYYY-MM-DD'),
-          agama: agama,
-          pendidikan: pendidikan,
-          jenis_pekerjaan: formData.pekerjaan,
-          status_perkawinan: statusKawin,
-          status_hub_keluarga: statusHub,
-          kewarganegaraan: formData.kewarganegaraan,
-          no_paspor: formData.noPaspor,
-          no_kitas_kitab: formData.noKitas,
-          ayah: formData.ayah,
-          ibu: formData.ibu
+          Agama: agama,
+          Pendidikan: pendidikan,
+          pekerjaan: formData.pekerjaan,
+          status_kawin: statusKawin,
+          SHDK: statusHub,
+          gol_darah: formData.gol_darah,
+          status: formData.status,
+          // Cacat: formData.cacat,
+          Ayah: formData.ayah,
+          Ibu: formData.ibu
         }
       ]
       
@@ -114,16 +130,80 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
 
     try {
       const res = await axios(requestOptions);
-      // console.log(res.data);
-      handleClose();
+      setLoading(false);
+      setSnackBar(true);
+      setTimeout(() => {
+        setSnackBar(false);
+      }, 3000);
+      // handleClose();
     } catch (err) {
       console.error(err);
     }
   };
 
+  // const fetchWilayah = async () => {
+  //   const options = {
+  //     method: 'GET',
+  //     url: "https://geoportal.big.go.id/sikambing/api/regions/",
+  //   };
+
+  //   try {
+  //     const data = await axios.request(options);
+  //     const wilayah = data.data;
+  //     return wilayah
+      
+  //   } catch {
+  //     console.error('Error fetching wilayah data');
+  //   }
+
+  // }
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const result = await fetchWilayah();
+  //     // setRegion(result);
+  //     console.log(result);
+      
+  //   }
+
+  //   fetchData()
+  // }, [])
+
+  const fetchWilayah = async () => {
+    const options = {
+      method: 'GET',
+      url: "/api/wilayah", // API route in your Next.js app
+    };
+  
+    try {
+      const data = await axios.request(options);
+      const wilayah = data.data;
+      return wilayah;
+    } catch {
+      console.error('Error fetching wilayah data');
+    }
+  }
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await fetchWilayah();
+      setRegion(result.data)
+      // console.log(result);
+    }
+  
+    fetchData();
+  }, []);
+  
+
   return (
+
     <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
       <Box sx={style}>
+        {snackBar && 
+         <Alert icon={<Check fontSize="inherit" />} severity="success">
+         Berhasil! Silahkan lakukan sinkronisasi data
+       </Alert>
+        }
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={5}>
           <Typography id="modal-title" variant="h6">
             Tambah Anggota Keluarga
@@ -187,15 +267,23 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
                 </Select>
               </FormControl>
             </Grid>
+
             <Grid item xs={12} md={4}>
-              <TextField
-                fullWidth
-                label='Tempat Lahir'
-                name="tempatLahir"
-                value={formData.tempatLahir}
-                onChange={handleChange}
+              <Autocomplete
+                disablePortal
+                id="combo-box-wilayah"
+                options={region}
+                getOptionLabel={(option) => option.name}  // Display the region name
+                renderInput={(params) => (
+                  <TextField {...params} label="Tempat Lahir" name="tempatLahir" />
+                )}
+                onChange={(e, value) => handleChange({ target: { name: 'tempatLahir', value: value ? value.name : '' } })}
+                value={region.find((item) => item.name === formData.tempatLahir) || null}
               />
             </Grid>
+
+            
+            
             <Grid item xs={12} md={4}>
               <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="id">
                 <DatePicker
@@ -265,12 +353,12 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
             </Grid>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth>
-                <InputLabel id="status-hubungan">Status Hubungan</InputLabel>
+                <InputLabel id="status-hubungan">Status Hubungan Dlm Keluarga</InputLabel>
                 <Select
                   labelId="status-hubungan"
                   id="status-hubungan-select"
                   value={statusHub}
-                  label="Status Hubungan"
+                  label="Status Hubungan Dlm Keluarga"
                   onChange={(e) => setStatusHub(e.target.value)}
                 >
                   {statusHubList.map((item, index) => (
@@ -282,30 +370,22 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
+                label='Gol. Darah'
+                name="gol_darah"
+                value={formData.gol_darah}
+                onChange={handleChange}
+              />
+            </Grid>
+            {/* <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
                 label='Kewarganegaraan'
                 name="kewarganegaraan"
                 value={formData.kewarganegaraan}
                 onChange={handleChange}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label='No Paspor'
-                name="noPaspor"
-                value={formData.noPaspor}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label='No Kitas'
-                name="noKitas"
-                value={formData.noKitas}
-                onChange={handleChange}
-              />
-            </Grid>
+            </Grid> */}
+           
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
@@ -324,10 +404,46 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
                 onChange={handleChange}
               />
             </Grid>
+
             <Grid item xs={12} md={12}>
-              <Button variant="contained" color="primary" type="submit" fullWidth>
+              <FormControl fullWidth>
+                <InputLabel id="status-pddk">Status Penduduk</InputLabel>
+                <Select
+                  labelId="status-pddk"
+                  id="status-pddk-select"
+                  value={sttsPddk}
+                  label="Status Penduduk"
+                  onChange={(e) => setSttsPddk(e.target.value)}
+                >
+                  {statusPddk.map((item, index) => (
+                    <MenuItem key={index} value={item}>{item}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              {/* <TextField
+                fullWidth
+                label='Status'
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+              /> */}
+            </Grid>
+            
+
+            <Grid item xs={12} md={12}>
+              {/* <Button variant="contained" color="primary" type="submit" fullWidth>
                 Simpan
-              </Button>
+              </Button> */}
+              {
+                loading ? (<LoadingButton
+                  fullWidth
+                  loading
+                  variant='contained'>
+                    Loading...
+                  </LoadingButton>) : ( <Button variant="contained" color="primary" type="submit" fullWidth>
+                Simpan
+              </Button>)
+              }
             </Grid>
           </Grid>
         </form>

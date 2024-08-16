@@ -130,7 +130,7 @@ function DataPendudukSls() {
   };
 
   const columns = [
-    "Nama SLS",
+    // "Nama SLS",
     "Nomor KK",
     "NIK",
     "Nama Kepala Keluarga",
@@ -143,7 +143,7 @@ function DataPendudukSls() {
           const kodeSls = router.query.idSls;
           const kodeKec = router.query.idKec;
           const kodeDesa = router.query.idDesa;
-          const noKK = tableMeta.rowData[1];
+          const noKK = tableMeta.rowData[0];
 
           return (
             <Button variant="outlined" onClick={() => handleAction(kodeDesa, kodeKec, kodeSls, noKK)}>
@@ -179,12 +179,12 @@ function DataPendudukSls() {
   const getPendudukSls = async (id_desa, id_kec, id_sls, offset, limit) => {
     const requestOptions = {
       method: 'GET',
-      url: 'https://db.bpstuban.my.id/api/v2/tables/me1snqf4cn07esw/records',
+      url: process.env.NEXT_PUBLIC_NOCO_PDDK_API,
       headers: {
         'xc-token': process.env.NEXT_PUBLIC_XC_TOKEN
       },
       params: {
-        "where": `(kode_desa,eq,${id_desa})~and(kode_kec,eq,${id_kec})~and(kode_sls,eq,${id_sls})~and(isKepalaKeluarga,eq,1)`,
+        "where": `(kode_desa,eq,${id_desa})~and(kode_kec,eq,${id_kec})~and(kode_sls,eq,${id_sls})~and(SHDK,eq,Kepala Keluarga)`,
         "offset": offset,
         "limit": limit
       }
@@ -207,10 +207,10 @@ function DataPendudukSls() {
         const result = await getPendudukSls(idDesa, idKec, idSls, offset, rowsPerPage);
 
         const transformedData = result.map(item => [
-          item.nama_sls,
+          // item.nama_sls,
           item.nomor_kk,
-          item.nik,
-          item.nama_lengkap,
+          item.NIK,
+          item.nama_pddk,
           "Action"
         ]);
         setData(transformedData);

@@ -8,7 +8,7 @@ export default async function handler(req, res) {
 
     const options = {
       method: 'GET',
-      url: 'https://db.bpstuban.my.id/api/v2/tables/m4tmvwaylufkqcj/records',
+      url: process.env.NEXT_PUBLIC_NOCO_USER_API,
       params: {
         where: `(username,eq,${username})`
       },

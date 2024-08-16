@@ -44,7 +44,7 @@ function DaftarDesa() {
   const getDesas = async (id_kec) => {
     const options = {
       method: 'GET',
-      url: 'https://db.bpstuban.my.id/api/v2/tables/m2peq82th9s0k3c/records',
+      url: process.env.NEXT_PUBLIC_NOCO_DESA_API,
       headers: {
         'xc-token': process.env.NEXT_PUBLIC_XC_TOKEN
       },
