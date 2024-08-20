@@ -79,7 +79,7 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
 
   const [loading, setLoading] = useState(false);
   const [snackBar, setSnackBar] = useState(false);
-  const [sttsPddk, setSttsPddk] = useState('');
+  // const [sttsPddk, setSttsPddk] = useState('');
 
   dayjs.locale('id');
 
@@ -311,7 +311,7 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
                   name="statusHub"
                   label="Status Hubungan"
                   onChange={handleChange}
-                  // onChange={(e) => setStatusHub(e.target.value)}
+                 
                 >
                   {statusHubList.map((item, index) => (
                     <MenuItem key={index} value={item}>{item}</MenuItem>
@@ -324,7 +324,8 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
                 fullWidth
                 label='Gol. Darah'
                 name="gol_darah"
-                value={formData.gol_darah}
+                value={formData.gol_darah === null || formData.gol_darah === 'Tdk Th' ? '-' : formData.gol_darah}
+              
                 onChange={handleChange}
                 
               />
@@ -349,32 +350,26 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
               />
             </Grid>
 
-
             <Grid item xs={12} md={12}>
               <FormControl fullWidth>
                 <InputLabel id="status-pddk">Status Penduduk</InputLabel>
                 <Select
                   labelId="status-pddk"
                   id="status-pddk-select"
-                  value={sttsPddk}
+                  name="status" 
+                  value={formData.status}
                   label="Status Penduduk"
-                  onChange={(e) => setSttsPddk(e.target.value)}
+                  onChange={handleChange} 
                 >
                   {statusPddk.map((item, index) => (
-                    <MenuItem key={index} value={item}>{item}</MenuItem>
+                    <MenuItem key={index} value={item}>
+                      {item}
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>
             </Grid>
-            {/* <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label='No Kitas'
-                name="noKitas"
-                value={formData.noKitas}
-                onChange={handleChange}
-              />
-            </Grid> */}
+
             
             <Grid item xs={12} md={12}>
               {

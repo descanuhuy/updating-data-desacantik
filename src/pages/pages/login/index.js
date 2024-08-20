@@ -141,9 +141,9 @@ const LoginPage = () => {
           
         >
           <Image
-            src="/images/logos/dc.png"
-            width={200}
-            height={100}
+            src="/images/logos/spanduk_logo.png"
+            width={150}
+            height={150}
             alt="Desa cantik"
           />
         </Box>

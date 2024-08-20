@@ -264,12 +264,11 @@ function DataKeluarga() {
                           <Grid item xs={12} md={4}>
                             <TextField
                               fullWidth
-                              label='Gol. Darah'
-                              value={item.gol_darah !== 'Tdk Th' ? item.no_paspor : '-'}
-                             
+                              label="Gol. Darah"
+                              value={item.gol_darah === null || item.gol_darah === 'Tdk Th' ? '-' : item.gol_darah}
                             />
-                         
                           </Grid>
+
 
                         
 

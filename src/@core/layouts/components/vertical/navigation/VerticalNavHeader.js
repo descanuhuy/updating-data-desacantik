@@ -14,7 +14,7 @@ import themeConfig from 'src/configs/themeConfig'
 const MenuHeaderWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between',
+  justifyContent: 'center',
   paddingRight: theme.spacing(4.5),
   transition: 'padding .25s ease-in-out',
   minHeight: theme.mixins.toolbar.minHeight
@@ -42,7 +42,7 @@ const VerticalNavHeader = props => {
   const theme = useTheme()
 
   return (
-    <MenuHeaderWrapper className='nav-header' sx={{ pl: 12 }}>
+    <MenuHeaderWrapper className='nav-header'>
       {userVerticalNavMenuBranding ? (
         userVerticalNavMenuBranding(props)
       ) : (
@@ -51,12 +51,12 @@ const VerticalNavHeader = props => {
           alignItems="center"
           justifyContent="center"
           sx={{marginBottom: 5, marginTop:5}}
-          // height="100vh" // Optional: This makes the Box full height of the viewport
+         
         >
           <Image
-            src="/images/logos/dc.png"
-            width={150}
-            height={50}
+            src="/images/logos/spanduk_logo.png"
+            width={80}
+            height={80}
             alt="Desa cantik"
           />
         </Box>

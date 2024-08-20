@@ -141,33 +141,7 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
     }
   };
 
-  // const fetchWilayah = async () => {
-  //   const options = {
-  //     method: 'GET',
-  //     url: "https://geoportal.big.go.id/sikambing/api/regions/",
-  //   };
-
-  //   try {
-  //     const data = await axios.request(options);
-  //     const wilayah = data.data;
-  //     return wilayah
-      
-  //   } catch {
-  //     console.error('Error fetching wilayah data');
-  //   }
-
-  // }
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const result = await fetchWilayah();
-  //     // setRegion(result);
-  //     console.log(result);
-      
-  //   }
-
-  //   fetchData()
-  // }, [])
+ 
 
   const fetchWilayah = async () => {
     const options = {
@@ -206,7 +180,7 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
         }
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={5}>
           <Typography id="modal-title" variant="h6">
-            Tambah Anggota Keluarga
+            Tambah Data
           </Typography>
           <IconButton onClick={handleClose}>
             <CloseIcon />
@@ -406,27 +380,40 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
             </Grid>
 
             <Grid item xs={12} md={12}>
-              <FormControl fullWidth>
+              {/* <FormControl fullWidth>
                 <InputLabel id="status-pddk">Status Penduduk</InputLabel>
                 <Select
                   labelId="status-pddk"
                   id="status-pddk-select"
-                  value={sttsPddk}
+                  value={formData.status}
                   label="Status Penduduk"
-                  onChange={(e) => setSttsPddk(e.target.value)}
+                  onChange={handleChange}
+                >
+                   {statusPddk.map((item, index) => (
+                    <MenuItem key={index} value={item}>
+                      {item}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl> */}
+               <FormControl fullWidth>
+                <InputLabel id="status-pddk">Status Penduduk</InputLabel>
+                <Select
+                  labelId="status-pddk"
+                  id="status-pddk-select"
+                  name="status" 
+                  value={formData.status}
+                  label="Status Penduduk"
+                  onChange={handleChange} 
                 >
                   {statusPddk.map((item, index) => (
-                    <MenuItem key={index} value={item}>{item}</MenuItem>
+                    <MenuItem key={index} value={item}>
+                      {item}
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>
-              {/* <TextField
-                fullWidth
-                label='Status'
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-              /> */}
+            
             </Grid>
             
 

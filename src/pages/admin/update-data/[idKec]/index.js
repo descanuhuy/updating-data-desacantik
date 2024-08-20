@@ -10,13 +10,11 @@ function DaftarDesa() {
   const router = useRouter();
 
   const handleAction = (kodeDesa, kodeKec) => {
-
     router.push(`/admin/update-data/${kodeKec}/${kodeDesa}`);
   };
 
   const columns = [
-    "Kode Kecamatan",
-    "Kode Desa",
+    "Nama Kecamatan",
     "Nama Desa",
     {
       name: "Aksi",
@@ -24,8 +22,8 @@ function DaftarDesa() {
         filter: false,
         sort: false,
         customBodyRender: (value, tableMeta, updateValue) => {
-          const kodeKec = tableMeta.rowData[0]; 
-          const kodeDesa = tableMeta.rowData[1];
+          const kodeDesa = tableMeta.rowData[2];
+          const kodeKec = router.query.idKec;
 
           return (
             <Button variant="outlined" onClick={() => handleAction(kodeDesa, kodeKec)}>
@@ -51,34 +49,54 @@ function DaftarDesa() {
       params: {
         "where": `(kode_kec,eq,${id_kec})`
       }
-    }
+    };
 
     try {
       const res = await axios(options);
-
       return res.data.list;
     } catch (err) {
       console.error(err);
-
       return [];
     }
-  }
+  };
+
+  const getKec = async () => {
+    const options = {
+      method: 'GET',
+      url: process.env.NEXT_PUBLIC_NOCO_KEC_API,
+      headers: {
+        'xc-token': process.env.NEXT_PUBLIC_XC_TOKEN
+      }
+    };
+
+    try {
+      const res = await axios(options);
+      return res.data.list; // Ensure you're getting the array
+    } catch (err) {
+      console.error(err);
+      return [];
+    }
+  };
 
   useEffect(() => {
-
     const fetchData = async () => {
-
       const { idKec } = router.query;
       if (idKec) {
-
+        const kecamatanData = await getKec();
         const result = await getDesas(idKec);
 
+        const kecMap = kecamatanData.reduce((acc, kec) => {
+          acc[kec.id_kec] = kec.nama_kec;
+          return acc;
+        }, {});
+
         const transformedData = result.map(item => [
-          item.kode_kec,
-          item.kode_desa,
+          kecMap[item.kode_kec], 
           item.nama_desa,
-          "Action"  
+          item.kode_desa,
+          "Action"
         ]);
+
         setData(transformedData);
         setLoading(false);
       }

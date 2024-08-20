@@ -8,6 +8,7 @@ import KoorKecCard from 'src/views/dashboard/KoorKecCard'
 import SuperAdminCard from 'src/views/dashboard/SuperAdminCard'
 import { useEffect, useState } from 'react'
 import { Box } from '@mui/material'
+import StatusChart from 'src/layouts/components/chart/statusChart'
 
 const Dashboard = () => {
   const [role, setRole] = useState('');
@@ -125,6 +126,13 @@ const Dashboard = () => {
         <Grid item xs={12} md={6}>
           <Box sx={{ backgroundColor: '#fff', padding: 4, borderRadius: 1, boxShadow: 1, height: '400px' }}>
             <ReactApexcharts options={options2} series={series} type='bar' height="100%" />
+          </Box>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Box sx={{ backgroundColor: '#fff', padding: 4, borderRadius: 1, boxShadow: 1, height: '400px' }}>
+            {/* <StatusChart /> */}
+            {/* <ReactApexcharts options={options2} series={series} type='bar' height="100%" /> */}
           </Box>
         </Grid>
       </Grid>

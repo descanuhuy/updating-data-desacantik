@@ -1,138 +1,45 @@
-// "use client";
-
-// import { Button } from '@mui/material';
-// import axios from 'axios';
-// import MUIDataTable from 'mui-datatables';
-// import { useRouter } from 'next/router';
-// import React, { useEffect, useState } from 'react';
-
-
-
-// function DataPendudukSls() {
-//   const [data, setData] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const router = useRouter();
-
-//   const handleAction = (kodeDesa, kodeKec, kodeSls, noKK) => {
-
-//     router.push(`/admin/update-data/${kodeKec}/${kodeDesa}/${kodeSls}/${noKK}`);
-//   };
-
-//   const columns = [
-//     "Nama SLS",
-//     "Nomor KK",
-//     "NIK",
-//     "Nama Kepala Keluarga",
-//     {
-//       name: "Aksi",
-//       options: {
-//         filter: false,
-//         sort: false,
-//         customBodyRender: (value, tableMeta, updateValue) => {
-//           const kodeSls = router.query.idSls; 
-//           const kodeKec = router.query.idKec;
-//           const kodeDesa = router.query.idDesa;
-//           const noKK = tableMeta.rowData[1];
-
-//           return (
-//             <Button variant="outlined" onClick={() => handleAction(kodeDesa, kodeKec, kodeSls, noKK)}>
-//               Detail
-//             </Button>
-//           );
-//         }
-//       }
-//     }
-//   ];
-  
-//   const options = {
-//     filterType: 'checkbox',
-//   };
-  
-//   const getPendudukSls = async (id_desa, id_kec, id_sls) => {
-//     const requestOptions = {
-//       method: 'GET',
-//       url: 'https://db.bpstuban.my.id/api/v2/tables/me1snqf4cn07esw/records',
-//       headers: {
-//         'xc-token': process.env.NEXT_PUBLIC_XC_TOKEN
-//       },
-//       params: {
-//         "where": `(kode_desa,eq,${id_desa})~and(kode_kec,eq,${id_kec})~and(kode_sls,eq,${id_sls})~and(isKepalaKeluarga,eq,1)`
-//       }
-//     }
-  
-//     try {
-//       const res = await axios(requestOptions);
-
-//       return res.data.list;
-//     } catch (err) {
-
-//       return [];
-//     }
-//   }
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       const { idDesa, idKec, idSls } = router.query;
-//       if (idDesa && idKec && idSls) {
-
-//         const result = await getPendudukSls(idDesa, idKec, idSls);
-        
-//         const transformedData = result.map(item => [
-//           item.nama_sls,
-//           item.nomor_kk,
-//           item.nik,
-//           item.nama_lengkap,
-//           "Action"  
-//         ]);
-//         setData(transformedData);
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchData();
-//   }, [router.query.idDesa, router.query.idKec, router.query.idSls]);
-
-//   return (
-//     <div>
-//       {loading ? (
-//         <p>Loading...</p>
-//       ) : (
-//         <MUIDataTable
-//           title={"Data Penduduk SLS"}
-//           data={data}
-//           columns={columns}
-//           options={options}
-//         />
-//       )}
-//     </div>
-//   );
-// }
-
-// export default DataPendudukSls;
-
 "use client";
 
-import { Button } from '@mui/material';
+import { Box, Button, Grid } from '@mui/material';
 import axios from 'axios';
+import { Plus, Sync } from 'mdi-material-ui';
 import MUIDataTable from 'mui-datatables';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import ModalAddAnggota from 'src/layouts/components/modal/addDataAnggota';
+import ModaEditSls from 'src/layouts/components/modal/editSls';
 
 function DataPendudukSls() {
   const [data, setData] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [offset, setOffset] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [idSls, setIdSls] = useState('');
   const router = useRouter();
+  
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+
+  const [openModalSLS, setOpenModalSLS] = useState(false);
+  const handleOpenModalSLS = () => setOpenModalSLS(true);
+  const handleCloseModalSLS = () => setOpenModalSLS(false);
+
+
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    handleClose();
+
+  };
 
   const handleAction = (kodeDesa, kodeKec, kodeSls, noKK) => {
     router.push(`/admin/update-data/${kodeKec}/${kodeDesa}/${kodeSls}/${noKK}`);
   };
 
   const columns = [
-    // "Nama SLS",
-    "Nomor KK",
-    "NIK",
+    "Alamat KK",
     "Nama Kepala Keluarga",
     {
       name: "Aksi",
@@ -143,12 +50,32 @@ function DataPendudukSls() {
           const kodeSls = router.query.idSls;
           const kodeKec = router.query.idKec;
           const kodeDesa = router.query.idDesa;
-          const noKK = tableMeta.rowData[0];
+          const noKK = tableMeta.rowData[2];
 
           return (
-            <Button variant="outlined" onClick={() => handleAction(kodeDesa, kodeKec, kodeSls, noKK)}>
-              Detail
-            </Button>
+            <Grid container spacing={2} justifyContent="left" alignItems="center">
+            <Grid item>
+              <Button
+                variant="outlined"
+                onClick={() => handleAction(kodeDesa, kodeKec, kodeSls, noKK)}
+              >
+                Detail
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                variant="contained"
+                color='secondary'
+                sx={{ color: "white !important" }}
+                onClick={() => {
+                  setIdSls(kodeSls);
+                  handleOpenModalSLS();
+                }}
+              >
+                Ubah SLS
+              </Button>
+            </Grid>
+          </Grid>
           );
         }
       }
@@ -157,10 +84,10 @@ function DataPendudukSls() {
 
   const options = {
     filterType: 'checkbox',
-    serverSide: true, // Enable server-side pagination
+    serverSide: true, 
     count: totalRecords,
     rowsPerPage: rowsPerPage,
-    rowsPerPageOptions: [10, 15, 25, 100], // Add 25 to the options
+    rowsPerPageOptions: [10, 15, 25, 100], 
     onTableChange: (action, tableState) => {
       switch (action) {
         case 'changePage':
@@ -207,10 +134,10 @@ function DataPendudukSls() {
         const result = await getPendudukSls(idDesa, idKec, idSls, offset, rowsPerPage);
 
         const transformedData = result.map(item => [
-          // item.nama_sls,
-          item.nomor_kk,
-          item.NIK,
+          item.alamat,
           item.nama_pddk,
+          item.nomor_kk,
+          item.kode_sls,
           "Action"
         ]);
         setData(transformedData);
@@ -222,12 +149,28 @@ function DataPendudukSls() {
 
   return (
     <div>
+      <Grid container spacing={2} justifyContent="left" alignItems="center">
+      <Grid item>
+        <Button onClick={handleOpen}  variant="contained" sx={{mb:3}} startIcon={<Plus />}>
+          Tambah Keluarga
+        </Button>
+      </Grid>
+      <Grid item>
+      <Button onClick={() => location.reload()} variant="contained" sx={{mb:3}} startIcon={<Sync />}>
+        Sync Data
+      </Button>
+      </Grid>
+    </Grid>
+     
+     
       <MUIDataTable
         title={"Data Penduduk SLS"}
         data={data}
         columns={columns}
         options={options}
       />
+       <ModalAddAnggota open={open} handleClose={handleClose} handleSubmit={handleSubmit} noKK={''}/>
+       <ModaEditSls open={openModalSLS} handleClose={handleCloseModalSLS} idSls={idSls}/>
     </div>
   );
 }

@@ -11,7 +11,7 @@ function DaftarSls() {
   const [loading, setLoading] = useState(true);
   const [totalRecords, setTotalRecords] = useState(0);
   const [offset, setOffset] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10); // Default rows per page
+  const [rowsPerPage, setRowsPerPage] = useState(10); 
   const router = useRouter();
 
   const handleAction = (kodeDesa, kodeKec, kodeSls) => {
@@ -19,16 +19,15 @@ function DaftarSls() {
   };
 
   const columns = [
-    "Kode SLS",
+    "Nama Desa",
     "Nama SLS",
-    // "Kode Desa",
     {
       name: "Aksi",
       options: {
         filter: false,
         sort: false,
         customBodyRender: (value, tableMeta, updateValue) => {
-          const kodeSls = tableMeta.rowData[0];
+          const kodeSls = tableMeta.rowData[2]; 
           const kodeKec = router.query.idKec;
           const kodeDesa = router.query.idDesa;
 
@@ -44,7 +43,7 @@ function DaftarSls() {
 
   const options = {
     filterType: 'checkbox',
-    serverSide: true, // Enable server-side pagination
+    serverSide: true, 
     count: totalRecords,
     rowsPerPage: rowsPerPage,
     onTableChange: (action, tableState) => {
@@ -62,7 +61,7 @@ function DaftarSls() {
     }
   };
 
-  const getSls = async (id_desa, offset, limit) => {
+  const getSls = async (id_desa, id_kec, offset, limit) => {
     const options = {
       method: 'GET',
       url: process.env.NEXT_PUBLIC_NOCO_SLS_API,
@@ -70,9 +69,7 @@ function DaftarSls() {
         'xc-token': process.env.NEXT_PUBLIC_XC_TOKEN
       },
       params: {
-        "where": `(kode_desa,eq,${id_desa})`,
-        "offset": offset,
-        "limit": limit
+        "where": `(kode_desa,eq,${id_desa})~and(kode_kec,eq,${id_kec})`,
       }
     }
 
@@ -82,29 +79,57 @@ function DaftarSls() {
       
       return res.data.list;
     } catch (err) {
+      console.error(err);
+      return [];
+    }
+  };
+
+  const getDesas = async (id_desa, id_kec) => {
+    const options = {
+      method: 'GET',
+      url: process.env.NEXT_PUBLIC_NOCO_DESA_API,
+      headers: {
+        'xc-token': process.env.NEXT_PUBLIC_XC_TOKEN
+      },
+      params: {
+        "where": `(kode_kec,eq,${id_kec})~and(kode_desa,eq,${id_desa})`
+      }
+    };
+
+    try {
+      const res = await axios(options);
+      return res.data.list;
+    } catch (err) {
+      console.error(err);
       return [];
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      const { idDesa } = router.query;
-      if (idDesa) {
-        const result = await getSls(idDesa, offset, rowsPerPage);
+      const { idDesa, idKec } = router.query;
+      if (idDesa && idKec) {
+        const result = await getSls(idDesa, idKec, offset, rowsPerPage);
+        const desasData = await getDesas(idDesa, idKec);
+        const desaMap = desasData.reduce((acc, desa) => {
+          acc[desa.kode_desa] = desa.nama_desa;
+          return acc;
+        }, {});
 
         const transformedData = result.map(item => [
-          item.id_sls,
+          desaMap[item.kode_desa] || 'Unknown Desa',
           item.nama_sls,
-          // item.kode_desa,
+          item.kode_sls, 
           "Action"
         ]);
+
         setData(transformedData);
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [router.query.idDesa, offset, rowsPerPage]);
+  }, [router.query.idDesa, router.query.idKec, offset, rowsPerPage]);
 
   return (
     <div>

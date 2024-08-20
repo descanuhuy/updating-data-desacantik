@@ -6,7 +6,7 @@ export default async function handler(req, res) {
 
   const options = {
     method: 'GET',
-    url: 'https://db.bpstuban.my.id/api/v2/tables/me1snqf4cn07esw/records',
+    url: process.env.NEXT_PUBLIC_NOCO_PDDK_API,
     params: {
       where: `(kode_kec,eq,${kode_kec})~and(kode_desa,eq,${kode_desa})`
     },

@@ -44,7 +44,6 @@ function UpdateData() {
     const fetchData = async () => {
       const result = await getKecamatans()
       setData(result.list)
-      
       setLoading(false)
     }
 
