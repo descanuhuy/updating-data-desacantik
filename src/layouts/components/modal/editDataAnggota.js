@@ -19,13 +19,22 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 800,
+  width: '55%', // Default width
+  overflowY: 'auto',
+  maxHeight: '80vh',
   bgcolor: 'background.paper',
   border: '1px solid #fff',
   boxShadow: 24,
   borderRadius: 1,
   p: 4,
+  '@media (max-width: 960px)': { 
+    width: '55%',
+  },
+  '@media (max-width: 600px)': { 
+    width: '70%',
+  },
 };
+
 
 const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
   const [formData, setFormData] = useState({
@@ -46,6 +55,7 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
     cacat: dataAnggota.Cacat,
     ayah: dataAnggota.Ayah,
     ibu: dataAnggota.Ibu,
+    isNew: dataAnggota.isNew,
   });
 
   const statusKawinList = ['Belum Kawin', 'Kawin', 'Cerai Hidup', 'Cerai Mati'];
@@ -163,23 +173,38 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
-              <TextField
+              {!formData.isNew ? ( <TextField
+                fullWidth
+                label='No KK'
+                name="noKK"
+                disabled
+                value={formData.noKK}
+                // onChange={handleChange}
+              />) :  (<TextField
                 fullWidth
                 label='No KK'
                 name="noKK"
                 value={formData.noKK}
                 onChange={handleChange}
-              />
+              />)}
+             
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField
+              {!formData.isNew ? ( <TextField
+                fullWidth
+                type='text'
+                label='NIK'
+                name="nik"
+                value={formData.nik}
+                disabled
+              />) : ( <TextField
                 fullWidth
                 type='text'
                 label='NIK'
                 name="nik"
                 value={formData.nik}
                 onChange={handleChange}
-              />
+              />)}
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField

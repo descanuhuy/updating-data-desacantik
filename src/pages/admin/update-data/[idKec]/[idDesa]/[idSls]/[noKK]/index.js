@@ -22,6 +22,7 @@ import { IconButton, Modal, Typography } from '@mui/material';
 import { Delete, NoteEdit, Plus, Sync, TagEdit } from 'mdi-material-ui';
 import ModalAddAnggota from 'src/layouts/components/modal/addDataAnggota';
 import ModalEditAnggota from 'src/layouts/components/modal/editDataAnggota';
+import dayjs from 'dayjs';
 
 const getKeluargas = async (noKK) => {
   const requestOptions = {
@@ -204,7 +205,8 @@ function DataKeluarga() {
                             <TextField
                               fullWidth
                               label='Tanggal Lahir'
-                              value={new Date(item.tgl_lahir).toLocaleDateString('id-ID')}
+                              // value={new Date(item.tgl_lahir).toLocaleDateString('id-ID')}
+                              value={dayjs(new Date(item.tgl_lahir)).format('MM/DD/YYYY')}
                              
                             />
                          

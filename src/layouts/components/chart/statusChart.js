@@ -6,7 +6,7 @@ import ReactApexcharts from 'react-apexcharts';
 import { Box } from '@mui/material';
 
 function StatusChart() {
-  const [chartData, setChartData] = useState([0, 0, 0, 0]); // Ada, Tidak Ada Meninggal, Tidak Ada Pecah KK, Tidak Ada Pindah
+  const [chartData, setChartData] = useState([0, 0, 0, 0]); 
   const [loading, setLoading] = useState(true);
 
   const statusLabels = [
@@ -42,6 +42,8 @@ function StatusChart() {
       setLoading(true);
       const data = await Promise.all(statusLabels.map(status => fetchData(status)));
       setChartData(data);
+      console.log(chartData);
+      
       setLoading(false);
     };
 

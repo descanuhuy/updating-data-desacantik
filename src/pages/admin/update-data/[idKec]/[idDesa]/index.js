@@ -1,10 +1,14 @@
 "use client";
 
-import { Button } from '@mui/material';
+import { Button, CircularProgress } from '@mui/material';
 import axios from 'axios';
+import { Download } from 'mdi-material-ui';
 import MUIDataTable from 'mui-datatables';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+import { saveAs } from 'file-saver';
+import { supabase } from 'src/pages/api/supabase';
 
 function DaftarSls() {
   const [data, setData] = useState([]);
@@ -12,7 +16,9 @@ function DaftarSls() {
   const [totalRecords, setTotalRecords] = useState(0);
   const [offset, setOffset] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10); 
+  const [downloading, setDownloading] = useState(false); 
   const router = useRouter();
+
 
   const handleAction = (kodeDesa, kodeKec, kodeSls) => {
     router.push(`/admin/update-data/${kodeKec}/${kodeDesa}/${kodeSls}`);
@@ -70,6 +76,8 @@ function DaftarSls() {
       },
       params: {
         "where": `(kode_desa,eq,${id_desa})~and(kode_kec,eq,${id_kec})`,
+        "offset": offset,
+        "limit": limit
       }
     }
 
@@ -105,43 +113,97 @@ function DaftarSls() {
     }
   };
 
+  const fetchData = async () => {
+    const { idDesa, idKec } = router.query;
+    if (idDesa && idKec) {
+      const result = await getSls(idDesa, idKec, offset, rowsPerPage);
+      const desasData = await getDesas(idDesa, idKec);
+      const desaMap = desasData.reduce((acc, desa) => {
+        acc[desa.kode_desa] = desa.nama_desa;
+        return acc;
+      }, {});
+
+      const transformedData = result.map(item => [
+        desaMap[item.kode_desa] || 'Unknown Desa',
+        item.nama_sls,
+        item.kode_sls, 
+        "Action"
+      ]);
+
+      setData(transformedData);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const { idDesa, idKec } = router.query;
-      if (idDesa && idKec) {
-        const result = await getSls(idDesa, idKec, offset, rowsPerPage);
-        const desasData = await getDesas(idDesa, idKec);
-        const desaMap = desasData.reduce((acc, desa) => {
-          acc[desa.kode_desa] = desa.nama_desa;
-          return acc;
-        }, {});
-
-        const transformedData = result.map(item => [
-          desaMap[item.kode_desa] || 'Unknown Desa',
-          item.nama_sls,
-          item.kode_sls, 
-          "Action"
-        ]);
-
-        setData(transformedData);
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, [router.query.idDesa, router.query.idKec, offset, rowsPerPage]);
+
+  const downloadCSV = async () => {
+    setDownloading(true);
+    try {
+      let allData = [];
+      let shouldFetchMore = true;
+      let offset = 0;
+      const limit = 1000; 
+  
+      while (shouldFetchMore) {
+        const { data, error, count } = await supabase
+          .from('penduduks')
+          .select('*', { count: 'exact' }) 
+          .range(offset, offset + limit - 1); 
+  
+        if (error) throw error;
+  
+        if (data.length > 0) {
+          allData = allData.concat(data);
+          offset += limit;
+          if (data.length < limit) {
+            shouldFetchMore = false; 
+          }
+        } else {
+          shouldFetchMore = false; 
+        }
+      }
+  
+      // Convert data to CSV format
+      const csvContent = 
+        "data:text/csv;charset=utf-8," +
+        [Object.keys(allData[0]).join(","), ...allData.map(row => Object.values(row).join(","))].join("\n");
+  
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      saveAs(blob, 'penduduks_data.csv');
+    } catch (error) {
+      console.error('Error downloading CSV:', error.message);
+    } finally {
+      setDownloading(false);
+    }
+  };
+  
 
   return (
     <div>
       {loading ? (
         <div>Loading...</div>
       ) : (
-        <MUIDataTable
-          title={"Daftar SLS"}
-          data={data}
-          columns={columns}
-          options={options}
-        />
+        <>
+          <Button
+            variant="contained"
+            sx={{ mb: 3 }}
+            startIcon={downloading ? <CircularProgress size={24} /> : <Download />}
+            onClick={downloadCSV}
+            disabled={downloading}
+          >
+            {downloading ? "Mengunduh..." : "Unduh Data"}
+          </Button>
+
+          <MUIDataTable
+            title={"Daftar SLS"}
+            data={data}
+            columns={columns}
+            options={options}
+          />
+        </>
       )}
     </div>
   );

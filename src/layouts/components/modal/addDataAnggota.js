@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, Autocomplete, Box, Button, Grid, IconButton, Modal, TextField, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers';
@@ -12,22 +11,32 @@ import Select from '@mui/material/Select';
 import axios from 'axios';
 import { LoadingButton } from '@mui/lab';
 import { Check } from 'mdi-material-ui';
+import router from 'next/router';
+import { route } from 'next/dist/server/router';
+import dayjs from 'dayjs';
 
 const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 800,
+  width: '55%', // Default width
+  overflowY: 'auto',
+  maxHeight: '80vh',
   bgcolor: 'background.paper',
   border: '1px solid #fff',
   boxShadow: 24,
   borderRadius: 1,
   p: 4,
+  '@media (max-width: 960px)': { 
+    width: '55%',
+  },
+  '@media (max-width: 600px)': { 
+    width: '70%',
+  },
 };
 
 const ModalAddAnggota = ({ open, handleClose, noKK }) => {
-  const [value, setValue] = useState(dayjs('2022-04-17'));
   const [statusKawin, setStatusKawin] = useState('');
   const [jk, setJk] = useState('');
   const [statusHub, setStatusHub] = useState('');
@@ -45,7 +54,7 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
     namaKepalaKeluarga: '',
     namaLengkap: '',
     tempatLahir: '',
-    tanggalLahir: dayjs(),
+    tanggalLahir: dayjs('01-01-1975'),
     gol_darah: '',
     status: '',
     // cacat: '',
@@ -120,9 +129,12 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
           SHDK: statusHub,
           gol_darah: formData.gol_darah,
           status: formData.status,
-          // Cacat: formData.cacat,
           Ayah: formData.ayah,
-          Ibu: formData.ibu
+          Ibu: formData.ibu,
+          kode_kec: router.query.idKec,
+          kode_desa: router.query.idDesa,
+          kode_sls: router.query.idSls,
+          isNew: true,
         }
       ]
       
@@ -146,7 +158,7 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
   const fetchWilayah = async () => {
     const options = {
       method: 'GET',
-      url: "/api/wilayah", // API route in your Next.js app
+      url: "/api/wilayah", 
     };
   
     try {
@@ -259,7 +271,8 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
             
             
             <Grid item xs={12} md={4}>
-              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="id">
+              
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="Tanggal Lahir"
                   value={formData.tanggalLahir}
@@ -350,15 +363,7 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
                 onChange={handleChange}
               />
             </Grid>
-            {/* <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label='Kewarganegaraan'
-                name="kewarganegaraan"
-                value={formData.kewarganegaraan}
-                onChange={handleChange}
-              />
-            </Grid> */}
+          
            
             <Grid item xs={12} md={6}>
               <TextField
@@ -418,9 +423,7 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
             
 
             <Grid item xs={12} md={12}>
-              {/* <Button variant="contained" color="primary" type="submit" fullWidth>
-                Simpan
-              </Button> */}
+             
               {
                 loading ? (<LoadingButton
                   fullWidth
