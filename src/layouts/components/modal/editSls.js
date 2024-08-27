@@ -1,13 +1,12 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
-import { Alert, Grid, IconButton, TextField } from '@mui/material';
+import { Alert, Grid, IconButton, Autocomplete, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import axios from 'axios';
-import { Check, Close, CloseCircleOutline } from 'mdi-material-ui';
+import { Check, Close } from 'mdi-material-ui';
+import { supabase } from 'src/pages/api/supabase';
 
 const style = {
   position: 'absolute',
@@ -22,72 +21,62 @@ const style = {
 };
 
 function ModaEditSls({ open, handleClose, noKK }) {
-  const [sls, setSls] = useState('');
-  const [alamat, setAlamat] = useState('');
+  const [sls, setSls] = useState(null);
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState(false);
+  const [slsOptions, setSlsOptions] = useState([]);
+
+  useEffect(() => {
+    const fetchSlsOptions = async () => {
+      try {
+        let { data, error } = await supabase.from('sls').select('id, kode_sls, nama_sls');
+        if (error) throw error;
+        setSlsOptions(data);
+      } catch (err) {
+        console.error('Failed to fetch SLS options:', err);
+      }
+    };
+
+    fetchSlsOptions();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
+    if (!sls) {
+      alert('Please select a valid SLS.');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const fetchOptions = {
-        method: 'GET',
-        url: process.env.NEXT_PUBLIC_NOCO_PDDK_API,
-        headers: {
-          'xc-token': process.env.NEXT_PUBLIC_XC_TOKEN,
-        },
-        params: {
-          where: `(nomor_kk,eq,${noKK})`,
-        },
-      };
+      const wilayah_id_terkecil_id = sls.id;
 
-      const res = await axios(fetchOptions);
-      const records = res.data.list;
+      const { error } = await supabase
+        .from('penduduks')
+        .update({ 
+          kode_sls: sls.kode_sls, 
+          wilayah_terkecil_id: wilayah_id_terkecil_id
+        })
+        .eq('nomor_kk', noKK);
 
-      const updatePromises = records.map(record => {
-        const requestOptions = {
-          method: 'PATCH',
-          url: process.env.NEXT_PUBLIC_NOCO_PDDK_API,
-          headers: {
-            'xc-token': process.env.NEXT_PUBLIC_XC_TOKEN,
-            'Content-Type': 'application/json',
-          },
-          data: {
-            Id: record.Id, 
-  
-            kode_sls: sls,
-            alamat: alamat
-            
-          }
-        };
-        return axios(requestOptions);
-      });
-
-      await Promise.all(updatePromises);
+      if (error) throw error;
 
       setLoading(false);
       setAlert(true);
       setTimeout(() => {
         setAlert(false);
       }, 3000);
-      // handleClose();
-      // Trigger snackbar or any other notification for successful update
+      handleClose();
     } catch (err) {
-      console.error(err);
+      console.error('Failed to update penduduks:', err);
       setLoading(false);
-      // Handle error, e.g., show an error message
     }
   };
 
   return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
+    <Modal open={open} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
       <Box sx={style}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={5}>
           <Typography id="modal-title" variant="h6">
@@ -97,36 +86,25 @@ function ModaEditSls({ open, handleClose, noKK }) {
             <Close />
           </IconButton>
         </Box>
-        {/* <Typography id="modal-modal-title" variant="h6" component="h2">
-          Ubah SLS
-        </Typography> */}
-        {alert && 
-         <Alert icon={<Check fontSize="inherit" />} severity="success">
-         Berhasil! Silahkan lakukan sinkronisasi data
-       </Alert>
-        }
+
+        {alert && (
+          <Alert icon={<Check fontSize="inherit" />} severity="success">
+            Berhasil! Silahkan lakukan sinkronisasi data
+          </Alert>
+        )}
         <form onSubmit={handleSubmit}>
-          <TextField
+          <Autocomplete
             fullWidth
-            type='text'
-            label='sls'
-            name="sls"
+            options={slsOptions}
+            getOptionLabel={(option) => `${option.nama_sls}`}
+            renderInput={(params) => <TextField {...params} label="SLS" />}
             value={sls}
-            onChange={(e) => setSls(e.target.value)}
-            sx={{mb:2, mt:4}}
-          />
-          <TextField
-            fullWidth
-            type='text'
-            label='alamat'
-            name="alamat"
-            value={alamat}
-            onChange={(e) => setAlamat(e.target.value)}
-            sx={{mb:4}}
+            onChange={(event, newValue) => setSls(newValue)}
+            sx={{ mb: 4, mt: 4 }}
           />
           <Grid item xs={12} md={12}>
             {loading ? (
-              <LoadingButton fullWidth loading variant='contained'>
+              <LoadingButton fullWidth loading variant="contained">
                 Loading...
               </LoadingButton>
             ) : (
@@ -142,3 +120,4 @@ function ModaEditSls({ open, handleClose, noKK }) {
 }
 
 export default ModaEditSls;
+

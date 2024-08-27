@@ -6,17 +6,17 @@ import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
 
 // ** Icons Imports
-import { BabyBottle } from 'mdi-material-ui';
+import { ArmFlex } from 'mdi-material-ui';
 
 // ** React Imports
 import { useEffect, useState } from 'react';
 import { supabase } from 'src/pages/api/supabase';
 
-// Utility function to calculate date range for age 1-4
+// Utility function to calculate date range for age 10-18
 const getAgeRange = () => {
   const today = new Date();
-  const endDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
-  const startDate = new Date(today.getFullYear() - 4, today.getMonth(), today.getDate());
+  const endDate = new Date(today.getFullYear() - 10, today.getMonth(), today.getDate());
+  const startDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
   return { startDate, endDate };
 };
 
@@ -80,7 +80,7 @@ const downloadCSV = async (startDateStr, endDateStr) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'balita_data.csv';
+    a.download = 'remaja_data.csv';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -90,13 +90,13 @@ const downloadCSV = async (startDateStr, endDateStr) => {
   }
 };
 
-const BalitaCard = () => {
-  const [balitaCount, setBalitaCount] = useState(0);
-  const [balitaData, setBalitaData] = useState([]);
+const RemajaCard = () => {
+  const [remajaCount, setRemajaCount] = useState(0);
+  const [remajaData, setRemajaData] = useState([]);
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
-    const fetchBalitaData = async () => {
+    const fetchRemajaData = async () => {
       try {
         const { startDate, endDate } = getAgeRange();
         const startDateStr = formatDate(startDate);
@@ -112,16 +112,16 @@ const BalitaCard = () => {
           throw error;
         }
 
-        console.log("balita:", data);
+        console.log("remaja:", data);
 
-        setBalitaCount(data.length);
-        setBalitaData(data);
+        setRemajaCount(data.length);
+        setRemajaData(data);
       } catch (error) {
         console.error('Error fetching penduduks data:', error);
       }
     };
 
-    fetchBalitaData();
+    fetchRemajaData();
   }, []);
 
   const { startDate, endDate } = getAgeRange();
@@ -142,13 +142,13 @@ const BalitaCard = () => {
         <Avatar
           sx={{ width: 50, height: 50, marginBottom: 2.25, color: 'common.white', backgroundColor: 'primary.main' }}
         >
-          <BabyBottle sx={{ fontSize: '2rem' }} />
+          <ArmFlex sx={{ fontSize: '2rem' }} />
         </Avatar>
         <Typography variant='h6' sx={{ marginBottom: 2.75 }}>
-          Balita
+          Remaja
         </Typography>
         <Typography variant='body2' sx={{ marginBottom: 6 }}>
-          Terdapat {balitaCount} penduduk Balita di Desa Plumpang
+          Terdapat {remajaCount} penduduk Remaja di Desa Plumpang
         </Typography>
         <Button 
           variant='contained' 
@@ -166,4 +166,4 @@ const BalitaCard = () => {
   );
 };
 
-export default BalitaCard;
+export default RemajaCard;

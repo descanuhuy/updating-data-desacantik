@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Autocomplete, Box, Button, Grid, IconButton, Modal, Snackbar, TextField, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import dayjs from 'dayjs';
+import "dayjs/locale/id";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers';
@@ -13,13 +14,14 @@ import axios from 'axios';
 import { LoadingButton } from '@mui/lab';
 import { useRouter } from 'next/router';
 import { Check } from 'mdi-material-ui';
+import { supabase } from 'src/pages/api/supabase';
 
 const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: '55%', // Default width
+  width: '55%',
   overflowY: 'auto',
   maxHeight: '80vh',
   bgcolor: 'background.paper',
@@ -39,22 +41,22 @@ const style = {
 const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
   const [formData, setFormData] = useState({
     noKK: dataAnggota.nomor_kk,
-    nik: dataAnggota.NIK,
+    nik: dataAnggota.nik,
     jk: dataAnggota.jk,
     statusKawin: dataAnggota.status_kawin,
-    statusHub: dataAnggota.SHDK,
-    agama: dataAnggota.Agama,
-    pendidikan: dataAnggota.Pendidikan,
+    statusHub: dataAnggota.shdk,
+    agama: dataAnggota.agama,
+    pendidikan: dataAnggota.pendidikan,
     namaKepalaKeluarga: dataAnggota.nama_kk,
     namaLengkap: dataAnggota.nama_pddk,
     tempatLahir: dataAnggota.tempat_lahir,
-    pekerjaan: dataAnggota.Pekerjaan,
+    pekerjaan: dataAnggota.pekerjaan,
     tanggalLahir: dayjs(dataAnggota.tgl_lahir),
     gol_darah: dataAnggota.gol_darah,
     status: dataAnggota.status,
-    cacat: dataAnggota.Cacat,
-    ayah: dataAnggota.Ayah,
-    ibu: dataAnggota.Ibu,
+    // cacat: dataAnggota.Cacat,
+    ayah: dataAnggota.ayah,
+    ibu: dataAnggota.ibu,
     isNew: dataAnggota.isNew,
   });
 
@@ -89,8 +91,7 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
 
   const [loading, setLoading] = useState(false);
   const [snackBar, setSnackBar] = useState(false);
-  // const [sttsPddk, setSttsPddk] = useState('');
-
+ 
   dayjs.locale('id');
 
   const handleChange = (e) => {
@@ -103,52 +104,50 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
     setFormData((prevData) => ({ ...prevData, tanggalLahir: date }));
   };
 
+  useEffect(() => {
+    console.log(dataAnggota);
+    
+  })
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const requestOptions = {
-      method: 'PATCH',
-      url: process.env.NEXT_PUBLIC_NOCO_PDDK_API,
-      headers: {
-        'xc-token': process.env.NEXT_PUBLIC_XC_TOKEN,
-        'Content-Type': 'application/json'
-      },
-      data: [
-        {
-          Id: dataAnggota.Id,
+    
+    try {
+      const { data, error } = await supabase
+        .from('penduduks')
+        .update({
           nomor_kk: formData.noKK,
-          NIK: formData.nik,
+          nik: formData.nik,
           nama_kk: formData.namaKepalaKeluarga,
           nama_pddk: formData.namaLengkap,
           jk: formData.jk,
           tempat_lahir: formData.tempatLahir,
-          tgl_lahir: formData.tanggalLahir.format('YYYY-MM-DD'),
-          Agama: formData.agama,
-          Pendidikan: formData.pendidikan,
-          Pekerjaan: formData.pekerjaan,
+          tgl_lahir: formData.tanggalLahir,
+          agama: formData.agama,
+          pendidikan: formData.pendidikan,
+          pekerjaan: formData.pekerjaan,
           status_kawin: formData.statusKawin,
-          SHDK: formData.statusHub,
+          shdk: formData.statusHub,
           gol_darah: formData.gol_darah,
           status: formData.status,
-          Cacat: formData.cacat,
-          Ayah: formData.ayah,
-          Ibu: formData.ibu
-        }
-      ]
-      
-    };
+          // Cacat: formData.cacat,
+          ayah: formData.ayah,
+          ibu: formData.ibu,
+        })
+        .eq('id', dataAnggota.id); 
 
-    try {
-      const res = await axios(requestOptions);
-        setLoading(false);
-        setSnackBar(true);
-        setTimeout(() => {
-          setSnackBar(false);
-        }, 3000);
-        // handleClose();
-      
+      setLoading(false);
+
+
+      if (error) throw error;
+
+      setSnackBar(true);
+      setTimeout(() => {
+        setSnackBar(false);
+      }, 3000);
     } catch (err) {
-      console.error(err);
+      console.error('Error updating data:', err);
     }
   };
 
@@ -173,7 +172,7 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
-              {!formData.isNew ? ( <TextField
+              {formData.isNew === 0 ? ( <TextField
                 fullWidth
                 label='No KK'
                 name="noKK"
@@ -190,7 +189,7 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
              
             </Grid>
             <Grid item xs={12} md={6}>
-              {!formData.isNew ? ( <TextField
+              {formData.isNew === 0 ? ( <TextField
                 fullWidth
                 type='text'
                 label='NIK'
@@ -254,13 +253,13 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
               <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="id">
                 <DatePicker
                   label="Tanggal Lahir"
-                  value={formData.tanggalLahir}
+                  value={formData.tanggalLahir ? dayjs(formData.tanggalLahir) : null}
                   onChange={handleDateChange}
                   name="tanggalLahir"
-                  renderInput={(params) => <TextField {...params} fullWidth />}
                 />
               </LocalizationProvider>
             </Grid>
+
             <Grid item xs={12} md={6}>
               <FormControl fullWidth>
                 <InputLabel id="agama">Agama</InputLabel>
@@ -271,7 +270,6 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
                   label="Agama"
                   name='agama'
                   onChange={handleChange}
-                  // onChange={(e) => setAgama(e.target.value)}
                 >
                   {agamaList.map((item, index) => (
                     <MenuItem key={index} value={item}>{item}</MenuItem>
@@ -288,8 +286,6 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
                   id="pendidikan-select"
                   value={formData.pendidikan}
                   label="Pendidikan"
-                  onChange={handleChange}
-                  // onChange={(e) => setPendidikan(e.target.value)}
                 >
                   {pendidikanList.map((item, index) => (
                     <MenuItem key={index} value={item}>{item}</MenuItem>
@@ -318,7 +314,6 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
                   value={formData.statusKawin}
                   label="Status Perkawinan"
                   onChange={handleChange}
-                  // onChange={(e) => setStatusKawin(e.target.value)}
                 >
                   {statusKawinList.map((item, index) => (
                     <MenuItem key={index} value={item}>{item}</MenuItem>

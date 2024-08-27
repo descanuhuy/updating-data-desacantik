@@ -2,15 +2,17 @@ import React, { useEffect, useState } from 'react';
 import MUIDataTable from "mui-datatables";
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import { Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
+import { supabase } from 'src/pages/api/supabase';
+import Breadcrumb from 'src/layouts/components/breadcrumb';
 
 function DaftarDesa() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const handleAction = (kodeDesa, kodeKec) => {
-    router.push(`/admin/update-data/${kodeKec}/${kodeDesa}`);
+  const handleAction = (wilayahId, kodeKec) => {
+    router.push(`/admin/update-data/${kodeKec}/${wilayahId}`);
   };
 
   const columns = [
@@ -22,11 +24,11 @@ function DaftarDesa() {
         filter: false,
         sort: false,
         customBodyRender: (value, tableMeta, updateValue) => {
-          const kodeDesa = tableMeta.rowData[2];
+          const wilayahId = tableMeta.rowData[2];
           const kodeKec = router.query.idKec;
 
           return (
-            <Button variant="outlined" onClick={() => handleAction(kodeDesa, kodeKec)}>
+            <Button variant="outlined" onClick={() => handleAction(wilayahId, kodeKec)}>
               Pilih
             </Button>
           );
@@ -39,67 +41,47 @@ function DaftarDesa() {
     filterType: 'checkbox',
   };
 
-  const getDesas = async (id_kec) => {
-    const options = {
-      method: 'GET',
-      url: process.env.NEXT_PUBLIC_NOCO_DESA_API,
-      headers: {
-        'xc-token': process.env.NEXT_PUBLIC_XC_TOKEN
-      },
-      params: {
-        "where": `(kode_kec,eq,${id_kec})`
-      }
-    };
-
-    try {
-      const res = await axios(options);
-      return res.data.list;
-    } catch (err) {
-      console.error(err);
-      return [];
-    }
-  };
-
-  const getKec = async () => {
-    const options = {
-      method: 'GET',
-      url: process.env.NEXT_PUBLIC_NOCO_KEC_API,
-      headers: {
-        'xc-token': process.env.NEXT_PUBLIC_XC_TOKEN
-      }
-    };
-
-    try {
-      const res = await axios(options);
-      return res.data.list; // Ensure you're getting the array
-    } catch (err) {
-      console.error(err);
-      return [];
-    }
-  };
 
   useEffect(() => {
+
+    const role = localStorage.getItem('role');
+    const kodeKec = localStorage.getItem('kode_kec');
+    const kodeDesa = localStorage.getItem('kode_desa');
+
+    if (role === 'koor_desa') {
+      router.push(`/admin/update-data/${kodeKec}/${kodeDesa}`);
+    } else if (role === 'koor_kec') {
+      router.push(`/admin/update-data/${kodeKec}`);
+    }
+    
     const fetchData = async () => {
-      const { idKec } = router.query;
-      if (idKec) {
-        const kecamatanData = await getKec();
-        const result = await getDesas(idKec);
 
-        const kecMap = kecamatanData.reduce((acc, kec) => {
-          acc[kec.id_kec] = kec.nama_kec;
-          return acc;
-        }, {});
+    const { idKec } = router.query;
+      
+    let { data: desa_kelurahan, error } = await supabase
+    .from('desa_kelurahan')
+    .select(`
+        id,
+        kode_desa,
+        nama_desa,
+        kecamatan ( nama_kec )
+      `)
+    .eq('kode_kec', idKec);
 
-        const transformedData = result.map(item => [
-          kecMap[item.kode_kec], 
-          item.nama_desa,
-          item.kode_desa,
-          "Action"
-        ]);
+      const transformedData = desa_kelurahan.map(item => [
+        // kecMap[item.kode_kec], 
+        item.kecamatan.nama_kec,
+        item.nama_desa,
+        item.kode_desa,
+        "Action"
+      ]);
 
-        setData(transformedData);
-        setLoading(false);
-      }
+    // console.log(desa_kelurahan);
+    
+    setData(transformedData);
+    setLoading(false);
+        
+    
     };
 
     fetchData();
@@ -108,12 +90,22 @@ function DaftarDesa() {
   return (
     <div>
       {loading ? (<div>Loading...</div>) : (
+        <>
+          <Box sx={{ flexGrow: 1, marginBottom:2 }}>
+            <Breadcrumb 
+            items={[
+              { name: 'Update Data', url: '/admin/update-data' },
+              {name: 'Kelurahan/Desa', url: '#'}
+            ]}
+            />
+          </Box>
         <MUIDataTable
           title={"Daftar Kelurahan / Desa"}
           data={data}
           columns={columns}
           options={options}
-        />
+          />
+        </>
       )}
     </div>
   );

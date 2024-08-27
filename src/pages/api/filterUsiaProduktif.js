@@ -19,7 +19,6 @@ export default async function handler(req, res) {
     const response = await axios.request(options);
     const data = response.data.list;
 
-    // Define the boundary dates
     const now = new Date();
     const fifteenYearsAgo = subYears(now, 15);
     const sixtyFourYearsAgo = subYears(now, 64);

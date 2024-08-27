@@ -49,7 +49,7 @@ function KecamatanCard({data}) {
               </CardContent>
               <CardActions className='card-action-dense' sx={{ width: '100%' }}>
                 {/* <Button>Detail</Button> */}
-                <Button variant='contained' sx={{ py: 2, width: '100%'}} onClick={() => handleDetail(data.id_kec)}>
+                <Button variant='contained' sx={{ py: 2, width: '100%'}} onClick={() => handleDetail(data.kode_kec)}>
                   Lihat Detail
                 </Button>
               </CardActions>

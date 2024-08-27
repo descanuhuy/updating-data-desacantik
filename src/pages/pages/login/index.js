@@ -122,6 +122,8 @@ const LoginPage = () => {
       setLoading(false);
       localStorage.setItem('username', data.username);
       localStorage.setItem('role', data.role);
+      localStorage.setItem('kode_kec', data.kode_kec);
+      localStorage.setItem('kode_desa', data.kode_desa);
 
     } else {
       // Handle errors

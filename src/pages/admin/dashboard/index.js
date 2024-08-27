@@ -56,23 +56,35 @@ const Dashboard = () => {
       setIsMounted(true);
 
       const getRole = localStorage.getItem('role') || '';
+      const kodeDesa = localStorage.getItem('kode_desa') || '';
+      const kodeKec = localStorage.getItem('kode_kec') || '';
       setRole(getRole);
 
       const fetchGenderData = async () => {
         try {
-          const { count: lakiLakiCount, error: lakiLakiError } = await supabase
-            .from('penduduks')
-            .select('*', { count: 'exact' })
-            .eq('jk', 'Laki-Laki');
+          let query = supabase.from('penduduks').select('*', { count: 'exact' }).eq('jk', 'Laki-Laki');
+          
+          if (getRole === 'koor_desa') {
+            query = query.eq('kode_desa', kodeDesa).eq('kode_kec', kodeKec);
+          } else if (getRole === 'koor_kec') {
+            query = query.eq('kode_kec', kodeKec);
+          }
+
+          const { count: lakiLakiCount, error: lakiLakiError } = await query;
 
           if (lakiLakiError) {
             throw lakiLakiError;
           }
 
-          const { count: perempuanCount, error: perempuanError } = await supabase
-            .from('penduduks')
-            .select('*', { count: 'exact' })
-            .eq('jk', 'Perempuan');
+          query = supabase.from('penduduks').select('*', { count: 'exact' }).eq('jk', 'Perempuan');
+          
+          if (getRole === 'koor_desa') {
+            query = query.eq('kode_desa', kodeDesa).eq('kode_kec', kodeKec);
+          } else if (getRole === 'koor_kec') {
+            query = query.eq('kode_kec', kodeKec);
+          }
+
+          const { count: perempuanCount, error: perempuanError } = await query;
 
           if (perempuanError) {
             throw perempuanError;
@@ -281,3 +293,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+

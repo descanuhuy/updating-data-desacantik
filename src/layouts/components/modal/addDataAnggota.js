@@ -14,6 +14,7 @@ import { Check } from 'mdi-material-ui';
 import router from 'next/router';
 import { route } from 'next/dist/server/router';
 import dayjs from 'dayjs';
+import { supabase } from 'src/pages/api/supabase';
 
 const style = {
   position: 'absolute',
@@ -106,53 +107,65 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const requestOptions = {
-      method: 'POST',
-      url: process.env.NEXT_PUBLIC_NOCO_PDDK_API,
-      headers: {
-        'xc-token': process.env.NEXT_PUBLIC_XC_TOKEN,
-        'Content-Type': 'application/json'
-      },
-      data: [
-        {
-          nomor_kk: formData.noKK,
-          NIK: formData.nik,
-          nama_kk: formData.namaKepalaKeluarga,
-          nama_pddk: formData.namaLengkap,
-          jk: jk,
-          tempat_lahir: formData.tempatLahir,
-          tgl_lahir: formData.tanggalLahir.format('YYYY-MM-DD'),
-          Agama: agama,
-          Pendidikan: pendidikan,
-          pekerjaan: formData.pekerjaan,
-          status_kawin: statusKawin,
-          SHDK: statusHub,
-          gol_darah: formData.gol_darah,
-          status: formData.status,
-          Ayah: formData.ayah,
-          Ibu: formData.ibu,
-          kode_kec: router.query.idKec,
-          kode_desa: router.query.idDesa,
-          kode_sls: router.query.idSls,
-          isNew: true,
-        }
-      ]
-      
-    };
-
+  
     try {
-      const res = await axios(requestOptions);
+      const { data: slsData, error: slsError } = await supabase
+        .from('sls')
+        .select('id')
+        .eq('kode_sls', router.query.idSls)
+        .single();
+      
+      if (slsError || !slsData) {
+        throw new Error('Failed to fetch wilayah_id_terkecil');
+      }
+  
+      const data = {
+        nomor_kk: formData.noKK,
+        nik: formData.nik,
+        nama_kk: formData.namaKepalaKeluarga,
+        nama_pddk: formData.namaLengkap,
+        jk: jk,
+        tempat_lahir: formData.tempatLahir,
+        tgl_lahir: formData.tanggalLahir.format('YYYY-MM-DD'),
+        agama: agama,
+        pendidikan: pendidikan,
+        pekerjaan: formData.pekerjaan,
+        status_kawin: statusKawin,
+        shdk: statusHub,
+        gol_darah: formData.gol_darah,
+        status: formData.status,
+        ayah: formData.ayah,
+        ibu: formData.ibu,
+        kode_kec: router.query.idKec,
+        kode_desa: router.query.idDesa,
+        kode_sls: router.query.idSls,
+        wilayah_terkecil_id: slsData.id, 
+        isNew: 1,
+      };
+  
+
+      const { error: insertError } = await supabase
+        .from('penduduks')
+        .insert([data]);
+  
+      if (insertError) {
+        throw insertError;
+      }
+  
+      // Handle success
       setLoading(false);
       setSnackBar(true);
       setTimeout(() => {
         setSnackBar(false);
       }, 3000);
-      // handleClose();
+      
     } catch (err) {
       console.error(err);
+      // Handle error
+      setLoading(false);
     }
   };
-
+  
  
 
   const fetchWilayah = async () => {
@@ -174,7 +187,6 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
     const fetchData = async () => {
       const result = await fetchWilayah();
       setRegion(result.data)
-      // console.log(result);
     }
   
     fetchData();
@@ -259,7 +271,7 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
                 disablePortal
                 id="combo-box-wilayah"
                 options={region}
-                getOptionLabel={(option) => option.name}  // Display the region name
+                getOptionLabel={(option) => option.name}
                 renderInput={(params) => (
                   <TextField {...params} label="Tempat Lahir" name="tempatLahir" />
                 )}
@@ -272,7 +284,7 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
             
             <Grid item xs={12} md={4}>
               
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='id'>
                 <DatePicker
                   label="Tanggal Lahir"
                   value={formData.tanggalLahir}
@@ -385,22 +397,7 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
             </Grid>
 
             <Grid item xs={12} md={12}>
-              {/* <FormControl fullWidth>
-                <InputLabel id="status-pddk">Status Penduduk</InputLabel>
-                <Select
-                  labelId="status-pddk"
-                  id="status-pddk-select"
-                  value={formData.status}
-                  label="Status Penduduk"
-                  onChange={handleChange}
-                >
-                   {statusPddk.map((item, index) => (
-                    <MenuItem key={index} value={item}>
-                      {item}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl> */}
+              
                <FormControl fullWidth>
                 <InputLabel id="status-pddk">Status Penduduk</InputLabel>
                 <Select
