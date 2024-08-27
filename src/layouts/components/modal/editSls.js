@@ -68,7 +68,7 @@ function ModaEditSls({ open, handleClose, noKK }) {
       setTimeout(() => {
         setAlert(false);
       }, 3000);
-      handleClose();
+      // handleClose();
     } catch (err) {
       console.error('Failed to update penduduks:', err);
       setLoading(false);

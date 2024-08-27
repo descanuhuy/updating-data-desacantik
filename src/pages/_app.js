@@ -52,12 +52,12 @@ const App = props => {
   return (
     <CacheProvider value={emotionCache}>
       <Head>
-        <title>{`${themeConfig.templateName} - Update Data`}</title>
+        <title>{`${themeConfig.templateName} - Updating Data Kependudukan`}</title>
         <meta
           name='description'
-          content={`${themeConfig.templateName} – Material Design React Admin Dashboard Template – is the most developer friendly & highly customizable Admin Dashboard Template based on MUI v5.`}
+          content={`${themeConfig.templateName} – Website Updating Data Kependudukan.`}
         />
-        <meta name='keywords' content='Material Design, MUI, Admin Template, React Admin Template' />
+        <meta name='keywords' content='Desa Cantik, Desa Cantik BPS Tuban, Badan Pusat Statistik Kabupaten Tuban, Updating Data Kependudukan' />
         <meta name='viewport' content='initial-scale=1, width=device-width' />
       </Head>
 

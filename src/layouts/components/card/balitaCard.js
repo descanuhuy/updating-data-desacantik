@@ -12,15 +12,14 @@ import { BabyBottle } from 'mdi-material-ui';
 import { useEffect, useState } from 'react';
 import { supabase } from 'src/pages/api/supabase';
 
-// Utility function to calculate date range for age 1-4
 const getAgeRange = () => {
   const today = new Date();
-  const endDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
-  const startDate = new Date(today.getFullYear() - 4, today.getMonth(), today.getDate());
+  const endDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate()); // End date for age 1
+  const startDate = new Date(today.getFullYear() - 5, today.getMonth(), today.getDate()); // Start date for age 4
   return { startDate, endDate };
 };
 
-// Utility function to format date in yyyy-mm-dd
+
 const formatDate = (date) => {
   const day = String(date.getDate()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -28,7 +27,6 @@ const formatDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-// Utility function to generate and download CSV
 const downloadCSV = async (startDateStr, endDateStr) => {
   try {
     let allData = [];

@@ -16,7 +16,7 @@ import { supabase } from 'src/pages/api/supabase';
 const getAgeRange = () => {
   const today = new Date();
   const endDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
-  const startDate = new Date(today.getFullYear() - 2, today.getMonth(), today.getDate());
+  const startDate = new Date(today.getFullYear() - 3, today.getMonth(), today.getDate());
   return { startDate, endDate };
 };
 

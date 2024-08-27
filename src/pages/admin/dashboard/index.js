@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import ApexChartWrapper from 'src/@core/styles/libs/react-apexcharts';
 import { supabase } from 'src/pages/api/supabase';
+import { Card } from '@mui/material';
 
 const ReactApexcharts = dynamic(() => import('src/@core/components/react-apexcharts'), { ssr: false });
 const Trophy = dynamic(() => import('src/views/dashboard/Trophy'), { ssr: false });
@@ -122,13 +123,16 @@ const Dashboard = () => {
           const { count: nullCount, error: nullError } = await supabase
             .from('penduduks')
             .select('*', { count: 'exact' })
-            .eq('status', '');
+            .or('status.is.null,status.eq.');
 
           if (nullError) {
             throw nullError;
           }
+
           statusCounts['Tidak Terdaftar'] = nullCount || 0;
 
+          console.log("nullcout",nullCount);
+          
           setStatusData({
             series: statuses.map(status => statusCounts[status]),
             labels: statuses
@@ -231,28 +235,31 @@ const Dashboard = () => {
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <Box
-              sx={{
-                backgroundColor: '#fff',
-                padding: 4,
-                borderRadius: 1,
-                boxShadow: 1,
-                height: '400px'
-              }}
-            >
-              <ReactApexcharts
-                options={genderOptions}
-                series={genderData.series}
-                type="donut"
-                height="100%"
-              />
-            </Box>
+            <Card>
+              <Box
+                sx={{
+                  // backgroundColor: '#fff',
+                  padding: 4,
+                  borderRadius: 1,
+                  boxShadow: 1,
+                  height: '400px'
+                }}
+              >
+                <ReactApexcharts
+                  options={genderOptions}
+                  series={genderData.series}
+                  type="donut"
+                  height="100%"
+                />
+              </Box>
+            </Card>
           </Grid>
 
           <Grid item xs={12} md={6}>
+            <Card>
             <Box
               sx={{
-                backgroundColor: '#fff',
+                // backgroundColor: '#fff',
                 padding: 4,
                 borderRadius: 1,
                 boxShadow: 1,
@@ -266,25 +273,27 @@ const Dashboard = () => {
                 height="100%"
               />
             </Box>
+            </Card>
           </Grid>
 
           <Grid item xs={12} md={12}>
-            <Box
-              sx={{
-                backgroundColor: '#fff',
-                padding: 4,
-                borderRadius: 1,
-                boxShadow: 1,
-                height: '400px'
-              }}
-            >
-              <ReactApexcharts
-                options={educationOptions}
-                series={educationSeries}
-                type="bar"
-                height="100%"
-              />
-            </Box>
+              <Card>
+                <Box 
+                sx={{
+                  padding: 4,
+                  borderRadius: 1,
+                  boxShadow: 1,
+                  height: '400px'
+                }}>
+
+                  <ReactApexcharts
+                    options={educationOptions}
+                    series={educationSeries}
+                    type="bar"
+                    height="100%"
+                    />
+                </Box>
+              </Card>
           </Grid>
         </Grid>
       )}

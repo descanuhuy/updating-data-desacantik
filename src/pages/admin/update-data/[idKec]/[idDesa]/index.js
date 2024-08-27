@@ -11,7 +11,7 @@ import Breadcrumb from 'src/layouts/components/breadcrumb';
 
 function DaftarSls() {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
   const [page, setPage] = useState(0); // This tracks the current page number
   const [rowsPerPage, setRowsPerPage] = useState(10);

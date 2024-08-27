@@ -1,18 +1,13 @@
-// ** MUI Imports
 import Card from '@mui/material/Card';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
-
-// ** Icons Imports
 import { Briefcase } from 'mdi-material-ui';
-
-// ** React Imports
 import { useEffect, useState } from 'react';
 import { supabase } from 'src/pages/api/supabase';
 
-// Utility function to calculate date range for age 10-18
+// Utility function to calculate date range for age 15-64
 const getAgeRange = () => {
   const today = new Date();
   const endDate = new Date(today.getFullYear() - 15, today.getMonth(), today.getDate());
@@ -40,33 +35,33 @@ const UsiaKerjaCard = () => {
       let shouldFetchMore = true;
       let offset = 0;
       const limit = 1000;
-  
+
       while (shouldFetchMore) {
-        const { data, error } = await supabase
+        const { data, error, count } = await supabase
           .from('penduduks')
-          .select('*')
+          .select('nik, nama_kk, nama_pddk, ayah, ibu, tgl_lahir', { count: 'exact' })
           .gte('tgl_lahir', startDateStr)
           .lte('tgl_lahir', endDateStr)
           .range(offset, offset + limit - 1);
-  
+
         if (error) throw error;
-  
+
         if (data.length > 0) {
           allData = allData.concat(data);
           offset += limit;
-          if (data.length < limit) {
+          if (data.length < limit || offset >= count) {
             shouldFetchMore = false;
           }
         } else {
           shouldFetchMore = false;
         }
       }
-  
+
       if (allData.length === 0) {
         console.warn('No data to download');
         return;
       }
-  
+
       // Generate CSV content
       const csvHeaders = ['nik', 'nama kepala keluarga', 'nama', 'nama ayah', 'nama ibu'];
       const csvRows = [
@@ -79,13 +74,13 @@ const UsiaKerjaCard = () => {
           row.ibu || ''
         ].join(','))
       ];
-  
+
       const csvContent = csvRows.join('\n');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'usia_kerja_data.csv';
+      a.download = 'usia_produktif_data.csv';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -104,20 +99,34 @@ const UsiaKerjaCard = () => {
         const startDateStr = formatDate(startDate);
         const endDateStr = formatDate(endDate);
 
-        const { data, error } = await supabase
-          .from('penduduks')
-          .select('nik, nama_kk, nama_pddk, ayah, ibu, tgl_lahir')
-          .gte('tgl_lahir', startDateStr) 
-          .lte('tgl_lahir', endDateStr);  
+        let allData = [];
+        let offset = 0;
+        const limit = 1000;
+        let shouldFetchMore = true;
 
-        if (error) {
-          throw error;
+        while (shouldFetchMore) {
+          const { data, error, count } = await supabase
+            .from('penduduks')
+            .select('nik, nama_kk, nama_pddk, ayah, ibu, tgl_lahir', { count: 'exact' })
+            .gte('tgl_lahir', startDateStr)
+            .lte('tgl_lahir', endDateStr)
+            .range(offset, offset + limit - 1);
+
+          if (error) throw error;
+
+          if (data.length > 0) {
+            allData = allData.concat(data);
+            offset += limit;
+            if (data.length < limit || offset >= count) {
+              shouldFetchMore = false;
+            }
+          } else {
+            shouldFetchMore = false;
+          }
         }
 
-        console.log("usiaKerja:", data);
-
-        setUsiaKerjaCount(data.length);
-        setUsiaKerjaData(data);
+        setUsiaKerjaCount(allData.length);
+        setUsiaKerjaData(allData);
       } catch (error) {
         console.error('Error fetching penduduks data:', error);
       }
@@ -147,10 +156,10 @@ const UsiaKerjaCard = () => {
           <Briefcase sx={{ fontSize: '2rem' }} />
         </Avatar>
         <Typography variant='h6' sx={{ marginBottom: 2.75 }}>
-          Usia Kerja
+          Usia Produktif
         </Typography>
         <Typography variant='body2' sx={{ marginBottom: 6 }}>
-          Terdapat {usiaKerjaCount} Penduduk Usia Kerja di Desa Plumpang
+          Terdapat {usiaKerjaCount} Penduduk Usia Produktif di Desa Plumpang
         </Typography>
         <Button 
           variant='contained' 
