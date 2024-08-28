@@ -160,7 +160,7 @@ const Dashboard = () => {
 
           const pendidikanCounts = pendidikans.reduce((acc, pendidikan) => {
             acc[pendidikan] = 0;
-            
+
             return acc;
           }, {});
 
@@ -238,8 +238,8 @@ const Dashboard = () => {
       {isMounted && (
         <Grid container spacing={6}>
           <Grid item xs={12}>
-            {role === 'koor_desa' && <KoorDesaCard />}
-            {role === 'koor_kec' && <KoorKecCard />}
+            {(role === 'koor_desa' || role === 'enum_desa') && <KoorDesaCard />}
+            {(role === 'koor_kec' || role === 'enum_kec') && <KoorKecCard />}
             {role === 'superadmin' && <SuperAdminCard />}
             {!role && <Trophy />}
           </Grid>

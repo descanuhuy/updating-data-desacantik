@@ -93,6 +93,8 @@ const UsiaKerjaCard = () => {
   };
 
   useEffect(() => {
+    const kodeKec = localStorage.getItem('kode_kec');
+    const kodeDesa = localStorage.getItem('kode_desa');
     const fetchUsiaKerjaData = async () => {
       try {
         const { startDate, endDate } = getAgeRange();
