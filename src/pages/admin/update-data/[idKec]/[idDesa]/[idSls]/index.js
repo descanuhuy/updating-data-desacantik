@@ -16,6 +16,7 @@ function DataPendudukSls() {
   const [offset, setOffset] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [noKK, setNoKK] = useState(''); 
+  const [role, setRole ] = useState('');
   const router = useRouter();
   
   const [open, setOpen] = useState(false);
@@ -34,7 +35,7 @@ function DataPendudukSls() {
   const handleSubmit = (event) => {
 
     event.preventDefault();
-    
+
     handleClose();
   };
 
@@ -62,19 +63,21 @@ function DataPendudukSls() {
                   Detail
                 </Button>
               </Grid>
-              <Grid item>
-                <Button
-                  variant="contained"
-                  color='secondary'
-                  sx={{ color: "white !important" }}
-                  onClick={() => {
-                    setNoKK(noKK); 
-                    handleOpenModalSLS();
-                  }}
-                >
-                  Ubah SLS
-                </Button>
-              </Grid>
+              {role === 'koor_desa' || role === 'koor_kec' ? (<></>) : (<>
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    color='secondary'
+                    sx={{ color: "white !important" }}
+                    onClick={() => {
+                      setNoKK(noKK); 
+                      handleOpenModalSLS();
+                    }}
+                    >
+                    Ubah SLS
+                  </Button>
+                </Grid>
+              </>)}
             </Grid>
           );
         }
@@ -84,14 +87,12 @@ function DataPendudukSls() {
 
   const options = {
     filterType: 'checkbox',
-    serverSide: true, 
+    serverSide: true,
     count: totalRecords,
     rowsPerPage: rowsPerPage,
-    rowsPerPageOptions: [10, 15, 25, 100], 
+    rowsPerPageOptions: [10, 15, 25, 100],
     onTableChange: (action, tableState) => {
-
       switch (action) {
-
         case 'changePage':
           setOffset(tableState.page * tableState.rowsPerPage);
           break;
@@ -99,51 +100,66 @@ function DataPendudukSls() {
           setRowsPerPage(tableState.rowsPerPage);
           setOffset(0);
           break;
+        case 'search':
+          fetchData(tableState.searchText);  // Pass the search text
+          break;
         default:
           break;
       }
     }
   };
+  
 
-  const fetchData = async () => {
+  const fetchData = async (search = '') => {  
     setLoading(true);
   
-    const { data: penduduks, error, count } = await supabase
+    let query = supabase
       .from('penduduks')
       .select(`
         nama_kk,
         nomor_kk,
         kode_sls,
         wilayah_terkecil_id (nama_sls)
-        `, { count: 'exact' })
+      `, { count: 'exact' })
       .eq('kode_kec', idKec)  
       .eq('kode_desa', idDesa) 
       .eq('kode_sls', idSls)
       .eq('shdk', 'Kepala Keluarga')
-      .range(offset, offset + rowsPerPage - 1); 
+      .range(offset, offset + rowsPerPage - 1);
+  
+    if (search) {
+      query = query.ilike('nama_kk', `%${search}%`); 
+    }
+  
+    const { data: penduduks, error, count } = await query;
   
     if (error) {
       console.error('Error fetching data:', error.message);
       setLoading(false);
-
+      
       return;
     }
-
+  
     const transformedData = penduduks.map(item => [
       item.wilayah_terkecil_id.nama_sls, 
       item.nama_kk,   
       item.nomor_kk,        
       "Action"
     ]);
-
-    console.log(penduduks);
-    
+  
     setData(transformedData);
     setTotalRecords(count);
     setLoading(false);
   };
   
+  
   useEffect(() => {
+
+    const role = localStorage.getItem('role');
+    setRole(role);
+    const kodeKec = localStorage.getItem('kode_kec');
+    const kodeDesa = localStorage.getItem('kode_desa');
+    
     if (idKec && idDesa && idSls) {
       fetchData();
     }
@@ -171,16 +187,20 @@ function DataPendudukSls() {
           <Grid item xs={12} md={6}>
             <Box sx={{ display: 'flex', justifyContent: { xs: 'center', md: 'flex-end' } }}>
               <Grid container spacing={2} justifyContent="flex-end">
-                <Grid item>
-                  <Button onClick={handleOpen} variant="contained" sx={{ mb: 3 }} startIcon={<Plus />}>
+                {role === 'koor_desa' || role === 'koor_kec'? (<></>) : (
+                  <>
+                  <Grid item>
+                    <Button onClick={handleOpen} variant="contained" sx={{ mb: 3 }} startIcon={<Plus />}>
                     Tambah Keluarga
-                  </Button>
-                </Grid>
-                <Grid item>
-                  <Button onClick={() => location.reload()} variant="contained" sx={{ mb: 3 }} startIcon={<Sync />}>
+                    </Button>
+                  </Grid>
+                  <Grid item>
+                    <Button onClick={() => location.reload()} variant="contained" sx={{ mb: 3 }} startIcon={<Sync />}>
                     Sync Data
-                  </Button>
-                </Grid>
+                    </Button>
+                  </Grid>
+                  </>
+                )}
               </Grid>
             </Box>
           </Grid>

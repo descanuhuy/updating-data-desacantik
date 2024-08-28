@@ -88,6 +88,9 @@ const RemajaCard = () => {
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
+    const kodeKec = localStorage.getItem('kode_kec');
+    const kodeDesa = localStorage.getItem('kode_desa');
+
     const fetchRemajaData = async () => {
       try {
         const { startDate, endDate } = getAgeRange();
@@ -103,6 +106,8 @@ const RemajaCard = () => {
           const { data, error, count } = await supabase
             .from('penduduks')
             .select('nik, nama_kk, nama_pddk, ayah, ibu, tgl_lahir', { count: 'exact' })
+            .eq('kode_kec', kodeKec) 
+            .eq('kode_desa', kodeDesa) 
             .gte('tgl_lahir', startDateStr)
             .lte('tgl_lahir', endDateStr)
             .range(offset, offset + limit - 1);

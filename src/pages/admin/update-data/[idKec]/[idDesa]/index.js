@@ -1,20 +1,36 @@
+
 "use client";
 
-import { Box, Button, CircularProgress, Stack } from '@mui/material';
+import { Box, Button, CircularProgress } from '@mui/material';
 import { Download } from 'mdi-material-ui';
 import MUIDataTable from 'mui-datatables';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { saveAs } from 'file-saver';
 import { supabase } from 'src/pages/api/supabase';
 import Breadcrumb from 'src/layouts/components/breadcrumb';
+
+function debounce(func, wait) {
+  let timeout;
+
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
 
 function DaftarSls() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [page, setPage] = useState(0); // This tracks the current page number
+  const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [searchQuery, setSearchQuery] = useState('');
   const [downloading, setDownloading] = useState(false);
   const router = useRouter();
 
@@ -49,16 +65,20 @@ function DaftarSls() {
     filterType: 'checkbox',
     serverSide: true,
     count: totalRecords,
-    page: page, // Ensure the table knows the current page
+    page: page,
     rowsPerPage: rowsPerPage,
+    searchText: searchQuery,
+    onSearchChange: debounce((searchText) => {
+      setSearchQuery(searchText);
+    }, 500), // Debounce the search input by 500ms
     onTableChange: (action, tableState) => {
       switch (action) {
         case 'changePage':
-          setPage(tableState.page); // Update the page state
+          setPage(tableState.page);
           break;
         case 'changeRowsPerPage':
           setRowsPerPage(tableState.rowsPerPage);
-          setPage(0); // Reset to the first page
+          setPage(0);
           break;
         default:
           break;
@@ -68,11 +88,11 @@ function DaftarSls() {
 
   const fetchData = async () => {
     setLoading(true);
-  
+
     const { idKec, idDesa } = router.query;
     const offset = page * rowsPerPage;
-  
-    let { data: sls, error, count } = await supabase
+
+    let query = supabase
       .from('sls')
       .select(`
           id,
@@ -80,43 +100,48 @@ function DaftarSls() {
           wilayah_id (nama_desa),
           kode_sls
         `, { count: 'exact' })
-      .eq('kode_kec', idKec)  
-      .eq('kode_desa', idDesa) 
-      .range(offset, offset + rowsPerPage - 1); 
-  
+      .eq('kode_kec', idKec)
+      .eq('kode_desa', idDesa)
+      .range(offset, offset + rowsPerPage - 1);
+
+    if (searchQuery) {
+      query = query.ilike('nama_sls', `%${searchQuery}%`);
+    }
+
+    let { data: sls, error, count } = await query;
+
     if (error) {
       console.error('Error fetching data:', error.message);
       setLoading(false);
-
+      
       return;
-
     }
-    
+
     const transformedData = sls.map(item => [
-      item.wilayah_id.nama_desa, 
-      item.nama_sls,   
-      item.kode_sls,        
+      item.wilayah_id.nama_desa,
+      item.nama_sls,
+      item.kode_sls,
       "Action"
     ]);
 
-    // console.log(sls);
-    
-  
     setData(transformedData);
     setTotalRecords(count);
     setLoading(false);
   };
-  
 
   useEffect(() => {
-    if (router.query.idDesa && router.query.idKec) { 
+    if (router.query.idDesa && router.query.idKec) {
       fetchData();
     }
-  }, [router.query.idDesa, router.query.idKec, page, rowsPerPage]);
+  }, [router.query.idDesa, router.query.idKec, page, rowsPerPage, searchQuery]);
 
   const downloadCSV = async () => {
     setDownloading(true);
     try {
+
+      const kodeKec = localStorage.getItem('kode_kec');
+      const kodeDesa = localStorage.getItem('kode_desa');
+
       let allData = [];
       let shouldFetchMore = true;
       let offset = 0;
@@ -126,6 +151,8 @@ function DaftarSls() {
         const { data, error, count } = await supabase
           .from('penduduks')
           .select('*', { count: 'exact' })
+          .eq('kode_kec', kodeKec)
+          .eq('kode_desa', kodeDesa)
           .range(offset, offset + limit - 1);
 
         if (error) throw error;
@@ -160,9 +187,8 @@ function DaftarSls() {
         <div>Loading...</div>
       ) : (
         <>
-  
-         <Box sx={{ flexGrow: 1, marginBottom: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Breadcrumb 
+          <Box sx={{ flexGrow: 1, marginBottom: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Breadcrumb
               items={[
                 { name: 'Update Data', url: '/admin/update-data' },
                 { name: 'Kelurahan/Desa', url: `/admin/update-data/${router.query.idKec}` },
@@ -180,8 +206,6 @@ function DaftarSls() {
               {downloading ? "Mengunduh..." : "Unduh Data"}
             </Button>
           </Box>
-
-
 
           <MUIDataTable
             title={"Daftar SLS"}

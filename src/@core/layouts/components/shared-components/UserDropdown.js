@@ -171,12 +171,44 @@ const UserDropdown = () => {
             >
               <Avatar alt='John Doe' src='/images/avatars/1.png' sx={{ width: '2.5rem', height: '2.5rem' }} />
             </Badge>
-            <Box sx={{ display: 'flex', marginLeft: 3, alignItems: 'flex-start', flexDirection: 'column' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                marginLeft: 3,
+                alignItems: 'flex-start',
+                flexDirection: 'column',
+                width: '100%', // Ensure the box takes up full width
+              }}
+            >
+              <Typography
+                sx={{
+                  fontWeight: 600,
+                  fontSize: '1rem', // Adjust font size as needed
+                  wordBreak: 'break-word', // Allow breaking long words
+                  whiteSpace: 'normal', // Allow wrapping
+                  maxWidth: '100%', // Ensure the text stays within the box
+                }}
+              >
+                {username}
+              </Typography>
+              <Typography
+                variant='body2'
+                sx={{
+                  fontSize: '0.8rem', // Adjust font size as needed
+                  color: 'text.disabled',
+                }}
+              >
+                {role}
+              </Typography>
+            </Box>
+
+
+            {/* <Box sx={{ display: 'flex', marginLeft: 3, alignItems: 'flex-start', flexDirection: 'column' }}>
               <Typography sx={{ fontWeight: 600 }}>{username}</Typography>
               <Typography variant='body2' sx={{ fontSize: '0.8rem', color: 'text.disabled' }}>
                 {role}
               </Typography>
-            </Box>
+            </Box> */}
           </Box>
         </Box>
         <Divider sx={{ mt: 0, mb: 1 }} />

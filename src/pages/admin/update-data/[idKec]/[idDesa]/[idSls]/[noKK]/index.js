@@ -15,7 +15,7 @@ import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 
 import { IconButton, Modal, Typography } from '@mui/material';
-import { Delete, NoteEdit, Plus, Sync } from 'mdi-material-ui';
+import { Delete, FileEdit, NoteEdit, Plus, Sync } from 'mdi-material-ui';
 import ModalAddAnggota from 'src/layouts/components/modal/addDataAnggota';
 import ModalEditAnggota from 'src/layouts/components/modal/editDataAnggota';
 import dayjs from 'dayjs';
@@ -34,7 +34,7 @@ const getKeluargas = async (noKK) => {
 
     return [];
   }
-  
+
   return data;
 };
 
@@ -54,6 +54,7 @@ function DataKeluarga() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [noKK, setNoKK] = useState('');
+  const [role, setRole] = useState('');
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -77,6 +78,11 @@ function DataKeluarga() {
   };
 
   useEffect(() => {
+
+    
+    const role = localStorage.getItem('role');
+    setRole(role);
+
     const fetchData = async () => {
       const { noKK } = router.query;
       setNoKK(noKK);
@@ -98,6 +104,9 @@ function DataKeluarga() {
     <div>
       <Box sx={{ width: '100%', typography: 'body1' }}>
         <TabContext value={value}>
+
+          {role === 'koor_desa' || role === 'koor_kec' ? (<></>) : (<>
+
           <Box sx={{ display: 'flex', columnGap: 2 }}>
             <Button onClick={handleOpen} variant="contained" sx={{ mb: 3 }} startIcon={<Plus />}>
               Tambah
@@ -107,6 +116,7 @@ function DataKeluarga() {
               Sync Data
             </Button>
           </Box>
+          </>)}
 
           <ModalAddAnggota open={open} handleClose={handleClose} handleSubmit={handleSubmit} noKK={noKK} />
 
@@ -183,12 +193,13 @@ function DataKeluarga() {
                           <Grid item xs={12} md={12}>
                             <TextField fullWidth label="Status" value={item.status ? item.status : '-'} />
                           </Grid>
+                          {role === 'koor_desa' || role === 'koor_kec' ? (<></>) : (<>
                           <Grid container item xs={12}>
-                            <Button fullWidth onClick={handleOpenEdit} variant="contained" startIcon={<NoteEdit />}>
+                            <Button fullWidth onClick={handleOpenEdit} variant="contained" startIcon={<FileEdit />}>
                               Ubah
                             </Button>
                           </Grid>
-
+                           </>)}
                           <ModalEditAnggota open={openEditModal} handleClose={handleCloseEdit} dataAnggota={item} />
                         </Grid>
                       </form>

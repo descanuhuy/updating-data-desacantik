@@ -48,9 +48,9 @@ function DaftarDesa() {
     const kodeKec = localStorage.getItem('kode_kec');
     const kodeDesa = localStorage.getItem('kode_desa');
 
-    if (role === 'koor_desa') {
+    if (role === 'koor_desa' || role === 'enum_desa') {
       router.push(`/admin/update-data/${kodeKec}/${kodeDesa}`);
-    } else if (role === 'koor_kec') {
+    } else if (role === 'koor_kec' || role === 'enum_kec') {
       router.push(`/admin/update-data/${kodeKec}`);
     }
     

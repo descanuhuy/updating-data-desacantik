@@ -110,6 +110,8 @@ const UsiaKerjaCard = () => {
             .select('nik, nama_kk, nama_pddk, ayah, ibu, tgl_lahir', { count: 'exact' })
             .gte('tgl_lahir', startDateStr)
             .lte('tgl_lahir', endDateStr)
+            .eq('kode_kec', kodeKec)
+            .eq('kode_desa', kodeDesa) 
             .range(offset, offset + limit - 1);
 
           if (error) throw error;

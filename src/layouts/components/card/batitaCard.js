@@ -96,6 +96,8 @@ const BatitaCard = () => {
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
+    const kodeKec = localStorage.getItem('kode_kec');
+    const kodeDesa = localStorage.getItem('kode_desa');
     const fetchBatitaData = async () => {
       try {
         const { startDate, endDate } = getAgeRange();
@@ -106,13 +108,14 @@ const BatitaCard = () => {
           .from('penduduks')
           .select('nik, nama_kk, nama_pddk, ayah, ibu, tgl_lahir')
           .gte('tgl_lahir', startDateStr)
-          .lte('tgl_lahir', endDateStr);
+          .lte('tgl_lahir', endDateStr)
+          .eq('kode_kec', kodeKec)  // Apply kode_kec filter
+          .eq('kode_desa', kodeDesa) //
 
         if (error) {
           throw error;
         }
 
-        console.log("batita:", data);
 
         setBatitaCount(data.length);
         setBatitaData(data);
