@@ -31,8 +31,10 @@ const getKeluargas = async (noKK) => {
 
   if (error) {
     console.error('Error fetching data:', error);
+
     return [];
   }
+  
   return data;
 };
 

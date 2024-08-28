@@ -87,8 +87,11 @@ function DaftarSls() {
     if (error) {
       console.error('Error fetching data:', error.message);
       setLoading(false);
+
       return;
+
     }
+    
     const transformedData = sls.map(item => [
       item.wilayah_id.nama_desa, 
       item.nama_sls,   

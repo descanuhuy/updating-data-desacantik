@@ -43,10 +43,12 @@ export default async function handler(req, res) {
         kode_desa: user.kode_desa, });
     } catch (error) {
       console.error(error);
+
       return res.status(500).json({ message: 'Internal server error' });
     }
   } else {
     res.setHeader('Allow', ['POST']);
+    
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }

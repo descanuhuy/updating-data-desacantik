@@ -14,7 +14,9 @@ const SuperAdminCard = dynamic(() => import('src/views/dashboard/SuperAdminCard'
 
 const Dashboard = () => {
   const [role, setRole] = useState('');
+
   const [genderData, setGenderData] = useState({ series: [0, 0], labels: ['Laki-laki', 'Perempuan'] });
+
   const [statusData, setStatusData] = useState({
     series: [0, 0, 0, 0],
     labels: ['Ada', 'Tidak Ada', 'Meninggal', 'Pecah KK', 'Pindah', 'Tidak Terdaftar']
@@ -101,10 +103,14 @@ const Dashboard = () => {
       };
 
       const fetchStatusData = async () => {
+
         try {
+
           const statuses = ['Ada', 'Tidak Ada', 'Meninggal', 'Pecah KK', 'Pindah', 'Tidak Terdaftar'];
+
           const statusCounts = statuses.reduce((acc, status) => {
             acc[status] = 0;
+
             return acc;
           }, {});
 
@@ -144,13 +150,17 @@ const Dashboard = () => {
 
       const fetchPendidikanData = async () => {
         try {
+
           const pendidikans = [
+
             'Tidak/Belum Sekolah', 'Belum Tamat SD/Sederajat', 'Tamat SD/Sederajat',
             'SLTP/Sederajat', 'SLTA/Sederajat', 'Diploma I/II',
             'Akademi/Diploma III/S. Muda', 'Diploma IV/Strata I', 'Strata II'
           ];
+
           const pendidikanCounts = pendidikans.reduce((acc, pendidikan) => {
             acc[pendidikan] = 0;
+            
             return acc;
           }, {});
 

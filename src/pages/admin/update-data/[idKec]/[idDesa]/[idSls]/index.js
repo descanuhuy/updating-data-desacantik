@@ -32,7 +32,9 @@ function DataPendudukSls() {
   };
 
   const handleSubmit = (event) => {
+
     event.preventDefault();
+    
     handleClose();
   };
 
@@ -87,7 +89,9 @@ function DataPendudukSls() {
     rowsPerPage: rowsPerPage,
     rowsPerPageOptions: [10, 15, 25, 100], 
     onTableChange: (action, tableState) => {
+
       switch (action) {
+
         case 'changePage':
           setOffset(tableState.page * tableState.rowsPerPage);
           break;
@@ -121,6 +125,7 @@ function DataPendudukSls() {
     if (error) {
       console.error('Error fetching data:', error.message);
       setLoading(false);
+
       return;
     }
 

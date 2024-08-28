@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
 
 // ** Icons Imports
-import { BabyBottle } from 'mdi-material-ui';
+import { Baby, BabyBottle } from 'mdi-material-ui';
 
 // ** React Imports
 import { useEffect, useState } from 'react';
@@ -140,7 +140,7 @@ const BalitaCard = () => {
         <Avatar
           sx={{ width: 50, height: 50, marginBottom: 2.25, color: 'common.white', backgroundColor: 'primary.main' }}
         >
-          <BabyBottle sx={{ fontSize: '2rem' }} />
+          <Baby sx={{ fontSize: '2rem' }} />
         </Avatar>
         <Typography variant='h6' sx={{ marginBottom: 2.75 }}>
           Balita
