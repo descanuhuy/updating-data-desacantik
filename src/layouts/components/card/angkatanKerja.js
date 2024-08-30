@@ -39,7 +39,15 @@ const UsiaKerjaCard = () => {
       while (shouldFetchMore) {
         const { data, error, count } = await supabase
           .from('penduduks')
-          .select('nik, nama_kk, nama_pddk, ayah, ibu, tgl_lahir', { count: 'exact' })
+          .select(`
+            nik,
+            nama_kk,
+            nama_pddk,
+            ayah,
+            ibu,
+            tgl_lahir,
+            wilayah_terkecil_id (nama_sls)
+          `, { count: 'exact' })
           .gte('tgl_lahir', startDateStr)
           .lte('tgl_lahir', endDateStr)
           .range(offset, offset + limit - 1);
@@ -63,7 +71,7 @@ const UsiaKerjaCard = () => {
       }
 
       // Generate CSV content
-      const csvHeaders = ['nik', 'nama kepala keluarga', 'nama', 'nama ayah', 'nama ibu'];
+      const csvHeaders = ['nik', 'nama kepala keluarga', 'nama', 'nama ayah', 'nama ibu', 'tgl lahir', 'alamat'];
       const csvRows = [
         csvHeaders.join(','), // CSV header
         ...allData.map(row => [
@@ -71,7 +79,9 @@ const UsiaKerjaCard = () => {
           row.nama_kk || '',
           row.nama_pddk || '',
           row.ayah || '',
-          row.ibu || ''
+          row.ibu || '',
+          row.tgl_lahir || '',
+          row.wilayah_terkecil_id.nama_sls || '',
         ].join(','))
       ];
 
