@@ -449,13 +449,14 @@ const Dashboard = () => {
         try {
           let query = supabase.from('penduduks').select('*', { count: 'exact' }).eq('jk', 'Laki-Laki');
           
-          if (getRole === 'koor_desa') {
+          if (getRole === 'koor_desa' || getRole === 'enum_desa') {
             query = query.eq('kode_desa', kodeDesa).eq('kode_kec', kodeKec);
-          } else if (getRole === 'koor_kec') {
+          } else if (getRole === 'koor_kec' || getRole === 'enum_kec') {
             query = query.eq('kode_kec', kodeKec);
           }
 
           const { count: lakiLakiCount, error: lakiLakiError } = await query;
+          
 
           if (lakiLakiError) {
             throw lakiLakiError;
@@ -463,13 +464,14 @@ const Dashboard = () => {
 
           query = supabase.from('penduduks').select('*', { count: 'exact' }).eq('jk', 'Perempuan');
           
-          if (getRole === 'koor_desa') {
+          if (getRole === 'koor_desa' || getRole === 'enum_desa') {
             query = query.eq('kode_desa', kodeDesa).eq('kode_kec', kodeKec);
-          } else if (getRole === 'koor_kec') {
+          } else if (getRole === 'koor_kec' || getRole === 'enum_kec') {
             query = query.eq('kode_kec', kodeKec);
           }
 
           const { count: perempuanCount, error: perempuanError } = await query;
+        
 
           if (perempuanError) {
             throw perempuanError;
@@ -498,9 +500,9 @@ const Dashboard = () => {
               .select('*', { count: 'exact' })
               .eq('status', status);
 
-            if (getRole === 'koor_desa') {
+            if (getRole === 'koor_desa' || getRole === 'enum_desa') {
               query = query.eq('kode_desa', kodeDesa).eq('kode_kec', kodeKec);
-            } else if (getRole === 'koor_kec') {
+            } else if (getRole === 'koor_kec' || getRole === 'enum_kec') {
               query = query.eq('kode_kec', kodeKec);
             }
 
@@ -518,9 +520,9 @@ const Dashboard = () => {
             .select('*', { count: 'exact' })
             .or('status.is.null,status.eq.');
 
-          if (getRole === 'koor_desa') {
+          if (getRole === 'koor_desa' || getRole === 'enum_desa') {
             query = query.eq('kode_desa', kodeDesa).eq('kode_kec', kodeKec);
-          } else if (getRole === 'koor_kec') {
+          } else if (getRole === 'koor_kec' || getRole === 'enum_kec') {
             query = query.eq('kode_kec', kodeKec);
           }
 
@@ -560,9 +562,9 @@ const Dashboard = () => {
               .select('*', { count: 'exact' })
               .eq('pendidikan', pendidikan);
 
-            if (getRole === 'koor_desa') {
+            if (getRole === 'koor_desa' || getRole === 'enum_desa') {
               query = query.eq('kode_desa', kodeDesa).eq('kode_kec', kodeKec);
-            } else if (getRole === 'koor_kec') {
+            } else if (getRole === 'koor_kec' || getRole === 'enum_kec') {
               query = query.eq('kode_kec', kodeKec);
             }
 
