@@ -18,8 +18,8 @@ const Dashboard = () => {
   const [genderData, setGenderData] = useState({ series: [0, 0], labels: ['Laki-laki', 'Perempuan'] });
 
   const [statusData, setStatusData] = useState({
-    series: [0, 0, 0, 0],
-    labels: ['Ada', 'Tidak Ada', 'Meninggal', 'Pecah KK', 'Pindah', 'Tidak Terdaftar']
+    series: [0, 0, 0, 0, 0],
+    labels: ['Ada', 'Meninggal', 'Pecah KK', 'Pindah', 'Tidak Terdaftar']
   });
 
   const [educationSeries, setEducationSeries] = useState([
@@ -33,6 +33,19 @@ const Dashboard = () => {
     chart: {
       type: 'bar',
       height: 350
+    },
+     title: {
+      text: 'Jumlah Penduduk Berdasarkan Pendidikan',
+      align: 'left',
+      margin: 20,
+      offsetX: 0,
+      offsetY: 0,
+      floating: false,
+      style: {
+        fontSize:  '18px',
+        fontFamily:  undefined,
+        color:  '#0066B2'
+      },
     },
     plotOptions: {
       bar: {
@@ -106,7 +119,7 @@ const Dashboard = () => {
 
         try {
 
-          const statuses = ['Ada', 'Tidak Ada', 'Meninggal', 'Pecah KK', 'Pindah', 'Tidak Terdaftar'];
+          const statuses = ['Ada', 'Tidak ada, Meninggal', 'Tidak ada, Pecah KK', 'Tidak ada, Pindah', 'Tidak Terdaftar'];
 
           const statusCounts = statuses.reduce((acc, status) => {
             acc[status] = 0;
@@ -196,6 +209,19 @@ const Dashboard = () => {
       type: 'donut',
       height: 350
     },
+    title: {
+      text: 'Proporsi Berdasarkan Jenis Kelamin',
+      align: 'left',
+      margin: 20,
+      offsetX: 0,
+      offsetY: 0,
+      floating: false,
+      style: {
+        fontSize:  '16x',
+        fontFamily:  undefined,
+        color:  '#0066B2'
+      },
+    },
     labels: genderData.labels,
     responsive: [
       {
@@ -217,6 +243,33 @@ const Dashboard = () => {
       type: 'donut',
       height: 350
     },
+    toolbar: {
+        show: true,
+        export: {
+          svg: {
+            filename: "status_chart.svg",
+          },
+          png: {
+            filename: "status_chart.png",
+          }
+        },
+        autoSelected: 'zoom' 
+    },
+
+    title: {
+      text: 'Proporsi Berdasarkan Status Kependudukan',
+      align: 'left',
+      margin: 20,
+      offsetX: 0,
+      offsetY: 0,
+      floating: false,
+      style: {
+        fontSize:  '16px',
+        fontFamily:  undefined,
+        color:  '#0066B2'
+      },
+    },
+
     labels: statusData.labels,
     responsive: [
       {
