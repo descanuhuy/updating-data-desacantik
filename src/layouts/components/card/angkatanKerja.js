@@ -113,7 +113,7 @@ const UsiaKerjaCard = () => {
             .gte('tgl_lahir', startDateStr)
             .lte('tgl_lahir', endDateStr)
             .eq('kode_kec', kodeKec)
-            .eq('kode_desa', kodeDesa) 
+            .eq('kode_desa', kodeDesa)
             .range(offset, offset + limit - 1);
 
           if (error) throw error;
@@ -165,8 +165,8 @@ const UsiaKerjaCard = () => {
         <Typography variant='body2' sx={{ marginBottom: 6 }}>
           Terdapat {usiaKerjaCount} Penduduk Usia Produktif di Desa Plumpang
         </Typography>
-        <Button 
-          variant='contained' 
+        <Button
+          variant='contained'
           sx={{ padding: theme => theme.spacing(1.75, 5.5) }}
           onClick={() => downloadCSV(startDateStr, endDateStr)}
           disabled={downloading}
