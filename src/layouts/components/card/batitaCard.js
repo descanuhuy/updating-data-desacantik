@@ -11,6 +11,7 @@ import { Baby, BabyBottle } from 'mdi-material-ui';
 // ** React Imports
 import { useEffect, useState } from 'react';
 import { supabase } from 'src/pages/api/supabase';
+import { CircularProgress } from '@mui/material';
 
 // Utility function to calculate date range for age 1-2
 const getAgeRange = () => {
@@ -103,8 +104,10 @@ const BatitaCard = () => {
   const [batitaCount, setBatitaCount] = useState(0);
   const [batitaData, setBatitaData] = useState([]);
   const [downloading, setDownloading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     const kodeKec = localStorage.getItem('kode_kec');
     const kodeDesa = localStorage.getItem('kode_desa');
     const fetchBatitaData = async () => {
@@ -131,6 +134,7 @@ const BatitaCard = () => {
       } catch (error) {
         console.error('Error fetching penduduks data:', error);
       }
+      setLoading(false);
     };
 
     fetchBatitaData();
@@ -151,9 +155,13 @@ const BatitaCard = () => {
           padding: theme => `${theme.spacing(9.75, 5, 9.25)} !important`
         }}
       >
+
+        {loading ? (<>
+          <CircularProgress />
+        </>) : (<>
         <Avatar
           sx={{ width: 50, height: 50, marginBottom: 2.25, color: 'common.white', backgroundColor: 'primary.main' }}
-        >
+          >
           <BabyBottle sx={{ fontSize: '2rem' }} />
         </Avatar>
         <Typography variant='h6' sx={{ marginBottom: 2.75 }}>
@@ -173,6 +181,7 @@ const BatitaCard = () => {
         >
           {downloading ? 'Downloading...' : 'Unduh'}
         </Button>
+        </>)}
       </CardContent>
     </Card>
   );

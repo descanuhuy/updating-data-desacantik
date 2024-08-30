@@ -6,6 +6,7 @@ import CardContent from '@mui/material/CardContent';
 import { ArmFlex } from 'mdi-material-ui';
 import { useEffect, useState } from 'react';
 import { supabase } from 'src/pages/api/supabase';
+import { CircularProgress } from '@mui/material';
 
 
 const getAgeRange = () => {
@@ -66,7 +67,7 @@ const downloadCSV = async (startDateStr, endDateStr) => {
 
     const csvHeaders = ['nik', 'nama kepala keluarga', 'nama', 'nama ayah', 'nama ibu', 'tgl lahir', 'alamat'];
     const csvRows = [
-      csvHeaders.join(','), // CSV header
+      csvHeaders.join(','),
       ...allData.map(row => [
         row.nik || '',
         row.nama_kk || '',
@@ -96,8 +97,10 @@ const downloadCSV = async (startDateStr, endDateStr) => {
 const RemajaCard = () => {
   const [remajaCount, setRemajaCount] = useState(0);
   const [downloading, setDownloading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     const kodeKec = localStorage.getItem('kode_kec');
     const kodeDesa = localStorage.getItem('kode_desa');
 
@@ -142,6 +145,7 @@ const RemajaCard = () => {
       } catch (error) {
         console.error('Error fetching penduduks data:', error);
       }
+      setLoading(false);
     };
   
     fetchRemajaData();
@@ -163,6 +167,10 @@ const RemajaCard = () => {
           padding: theme => `${theme.spacing(9.75, 5, 9.25)} !important`
         }}
       >
+        {loading ? (<>
+          <CircularProgress />
+        </>) : (<>
+        
         <Avatar
           sx={{ width: 50, height: 50, marginBottom: 2.25, color: 'common.white', backgroundColor: 'primary.main' }}
         >
@@ -182,9 +190,10 @@ const RemajaCard = () => {
             downloadCSV(startDateStr, endDateStr).finally(() => setDownloading(false));
           }}
           disabled={downloading}
-        >
+          >
           {downloading ? 'Downloading...' : 'Unduh'}
         </Button>
+        </>)}
       </CardContent>
     </Card>
   );

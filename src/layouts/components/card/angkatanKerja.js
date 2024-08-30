@@ -6,6 +6,7 @@ import CardContent from '@mui/material/CardContent';
 import { Briefcase } from 'mdi-material-ui';
 import { useEffect, useState } from 'react';
 import { supabase } from 'src/pages/api/supabase';
+import { CircularProgress } from '@mui/material';
 
 // Utility function to calculate date range for age 15-64
 const getAgeRange = () => {
@@ -27,6 +28,7 @@ const UsiaKerjaCard = () => {
   const [usiaKerjaCount, setUsiaKerjaCount] = useState(0);
   const [usiaKerjaData, setUsiaKerjaData] = useState([]);
   const [downloading, setDownloading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const downloadCSV = async (startDateStr, endDateStr) => {
     setDownloading(true);
@@ -103,6 +105,7 @@ const UsiaKerjaCard = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
     const kodeKec = localStorage.getItem('kode_kec');
     const kodeDesa = localStorage.getItem('kode_desa');
     const fetchUsiaKerjaData = async () => {
@@ -144,6 +147,7 @@ const UsiaKerjaCard = () => {
       } catch (error) {
         console.error('Error fetching penduduks data:', error);
       }
+      setLoading(false);
     };
 
     fetchUsiaKerjaData();
@@ -164,6 +168,15 @@ const UsiaKerjaCard = () => {
           padding: theme => `${theme.spacing(9.75, 5, 9.25)} !important`
         }}
       >
+        {loading ? (<>
+          <CircularProgress />
+        </>) : 
+
+
+        
+        (<>
+        
+    
         <Avatar
           sx={{ width: 50, height: 50, marginBottom: 2.25, color: 'common.white', backgroundColor: 'primary.main' }}
         >
@@ -183,6 +196,7 @@ const UsiaKerjaCard = () => {
         >
           {downloading ? 'Downloading...' : 'Unduh'}
         </Button>
+        </>)}
       </CardContent>
     </Card>
   );

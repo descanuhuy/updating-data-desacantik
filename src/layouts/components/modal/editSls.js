@@ -40,29 +40,65 @@ function ModaEditSls({ open, handleClose, noKK }) {
     fetchSlsOptions();
   }, []);
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+
+  //   if (!sls) {
+  //     alert('Please select a valid SLS.');
+  //     setLoading(false);
+  //     return;
+  //   }
+
+  //   try {
+  //     const wilayah_id_terkecil_id = sls.id;
+  //     console.log(wilayah_id_terkecil_id);
+      
+
+  //     const { error } = await supabase
+  //       .from('penduduks')
+  //       .update({ 
+  //         kode_sls: sls.kode_sls, 
+  //         wilayah_terkecil_id: wilayah_id_terkecil_id
+  //       })
+  //       .eq('nomor_kk', noKK);
+
+  //     if (error) throw error;
+
+  //     setLoading(false);
+  //     setAlert(true);
+  //     setTimeout(() => {
+  //       setAlert(false);
+  //     }, 3000);
+  //     // handleClose();
+  //   } catch (err) {
+  //     console.error('Failed to update penduduks:', err);
+  //     setLoading(false);
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+  
     if (!sls) {
       alert('Please select a valid SLS.');
       setLoading(false);
       return;
     }
-
+  
     try {
-      const wilayah_id_terkecil_id = sls.id;
-
-      const { error } = await supabase
-        .from('penduduks')
-        .update({ 
-          kode_sls: sls.kode_sls, 
-          wilayah_terkecil_id: wilayah_id_terkecil_id
-        })
-        .eq('nomor_kk', noKK);
-
-      if (error) throw error;
-
+      const response = await fetch('/api/updatePenduduk', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ nomor_kk: noKK, sls })
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) throw new Error(data.error || 'Failed to update penduduks');
+  
       setLoading(false);
       setAlert(true);
       setTimeout(() => {
@@ -74,6 +110,7 @@ function ModaEditSls({ open, handleClose, noKK }) {
       setLoading(false);
     }
   };
+  
 
   return (
     <Modal open={open} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
@@ -120,4 +157,3 @@ function ModaEditSls({ open, handleClose, noKK }) {
 }
 
 export default ModaEditSls;
-

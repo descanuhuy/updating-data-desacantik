@@ -111,10 +111,12 @@ const ModalAddAnggota = ({ open, handleClose, noKK }) => {
     try {
       const { data: slsData, error: slsError } = await supabase
         .from('sls')
-        .select('id')
+        .select('*')
         .eq('kode_sls', router.query.idSls)
+        .eq('kode_desa', router.query.idDesa)
+        .eq('kode_kec', router.query.idKec)
         .single();
-      
+
       if (slsError || !slsData) {
         throw new Error('Failed to fetch wilayah_id_terkecil');
       }

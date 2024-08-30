@@ -105,7 +105,7 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
   };
 
   useEffect(() => {
-    console.log(dataAnggota);
+    // console.log(dataAnggota);
     
   })
 

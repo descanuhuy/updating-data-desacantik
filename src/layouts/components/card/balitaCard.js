@@ -11,6 +11,7 @@ import { Baby, BabyBottle } from 'mdi-material-ui';
 // ** React Imports
 import { useEffect, useState } from 'react';
 import { supabase } from 'src/pages/api/supabase';
+import { CircularProgress } from '@mui/material';
 
 const getAgeRange = () => {
   const today = new Date();
@@ -102,8 +103,10 @@ const BalitaCard = () => {
   const [balitaCount, setBalitaCount] = useState(0);
   const [balitaData, setBalitaData] = useState([]);
   const [downloading, setDownloading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     const kodeKec = localStorage.getItem('kode_kec');
     const kodeDesa = localStorage.getItem('kode_desa');
     const fetchBalitaData = async () => {
@@ -124,10 +127,11 @@ const BalitaCard = () => {
           throw error;
         }
         setBalitaCount(data.length);
-        setBalitaData(data);
+        setBalitaData(data);   
       } catch (error) {
         console.error('Error fetching penduduks data:', error);
       }
+      setLoading(false);
     };
 
     fetchBalitaData();
@@ -139,18 +143,24 @@ const BalitaCard = () => {
 
   return (
     <Card>
+     
+      
       <CardContent
-        sx={{
-          display: 'flex',
-          textAlign: 'center',
-          alignItems: 'center',
-          flexDirection: 'column',
-          padding: theme => `${theme.spacing(9.75, 5, 9.25)} !important`
+      sx={{
+        display: 'flex',
+        textAlign: 'center',
+        alignItems: 'center',
+        flexDirection: 'column',
+        padding: theme => `${theme.spacing(9.75, 5, 9.25)} !important`
         }}
-      >
+        >
+        {loading ? (<>
+          <CircularProgress />
+        </>) : 
+        (<>
         <Avatar
           sx={{ width: 50, height: 50, marginBottom: 2.25, color: 'common.white', backgroundColor: 'primary.main' }}
-        >
+          >
           <Baby sx={{ fontSize: '2rem' }} />
         </Avatar>
         <Typography variant='h6' sx={{ marginBottom: 2.75 }}>
@@ -167,9 +177,10 @@ const BalitaCard = () => {
             downloadCSV(startDateStr, endDateStr).finally(() => setDownloading(false));
           }}
           disabled={downloading}
-        >
+          >
           {downloading ? 'Downloading...' : 'Unduh'}
         </Button>
+        </>)}
       </CardContent>
     </Card>
   );

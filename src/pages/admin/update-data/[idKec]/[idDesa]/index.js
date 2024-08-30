@@ -70,7 +70,7 @@ function DaftarSls() {
     searchText: searchQuery,
     onSearchChange: debounce((searchText) => {
       setSearchQuery(searchText);
-    }, 500), // Debounce the search input by 500ms
+    }, 800), 
     onTableChange: (action, tableState) => {
       switch (action) {
         case 'changePage':
