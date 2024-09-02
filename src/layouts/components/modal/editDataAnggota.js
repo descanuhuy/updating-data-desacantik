@@ -103,53 +103,90 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
   const handleDateChange = (date) => {
     setFormData((prevData) => ({ ...prevData, tanggalLahir: date }));
   };
-
-  useEffect(() => {
-    // console.log(dataAnggota);
-    
-  })
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+  
     try {
-      const { data, error } = await supabase
-        .from('penduduks')
-        .update({
-          nomor_kk: formData.noKK,
-          nik: formData.nik,
-          nama_kk: formData.namaKepalaKeluarga,
-          nama_pddk: formData.namaLengkap,
-          jk: formData.jk,
-          tempat_lahir: formData.tempatLahir,
-          tgl_lahir: formData.tanggalLahir,
-          agama: formData.agama,
-          pendidikan: formData.pendidikan,
-          pekerjaan: formData.pekerjaan,
-          status_kawin: formData.statusKawin,
-          shdk: formData.statusHub,
-          gol_darah: formData.gol_darah,
-          status: formData.status,
-          // Cacat: formData.cacat,
-          ayah: formData.ayah,
-          ibu: formData.ibu,
-        })
-        .eq('id', dataAnggota.id); 
-
+      const response = await axios.put('/api/updatePenduduk', {
+        id: dataAnggota.id,
+        nomor_kk: formData.noKK,
+        nik: formData.nik,
+        nama_kk: formData.namaKepalaKeluarga,
+        nama_pddk: formData.namaLengkap,
+        jk: formData.jk,
+        tempat_lahir: formData.tempatLahir,
+        tgl_lahir: dayjs(formData.tanggalLahir).format('YYYY-MM-DD'),
+        agama: formData.agama,
+        pendidikan: formData.pendidikan,
+        pekerjaan: formData.pekerjaan,
+        status_kawin: formData.statusKawin,
+        shdk: formData.statusHub,
+        gol_darah: formData.gol_darah,
+        status: formData.status,
+        ayah: formData.ayah,
+        ibu: formData.ibu,
+      });
+  
       setLoading(false);
-
-
-      if (error) throw error;
-
-      setSnackBar(true);
-      setTimeout(() => {
-        setSnackBar(false);
-      }, 3000);
+  
+      if (response.data.success) {
+        setSnackBar(true);
+        setTimeout(() => {
+          setSnackBar(false);
+        }, 3000);
+      } else {
+        console.error('Error updating data:', response.data.error);
+      }
     } catch (err) {
       console.error('Error updating data:', err);
     }
   };
+  
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+    
+  //   try {
+  //     const { data, error } = await supabase
+  //       .from('penduduks')
+  //       .update({
+  //         nomor_kk: formData.noKK,
+  //         nik: formData.nik,
+  //         nama_kk: formData.namaKepalaKeluarga,
+  //         nama_pddk: formData.namaLengkap,
+  //         jk: formData.jk,
+  //         tempat_lahir: formData.tempatLahir,
+  //         tgl_lahir: formData.tanggalLahir,
+  //         agama: formData.agama,
+  //         pendidikan: formData.pendidikan,
+  //         pekerjaan: formData.pekerjaan,
+  //         status_kawin: formData.statusKawin,
+  //         shdk: formData.statusHub,
+  //         gol_darah: formData.gol_darah,
+  //         status: formData.status,
+  //         // Cacat: formData.cacat,
+  //         ayah: formData.ayah,
+  //         ibu: formData.ibu,
+  //       })
+  //       .eq('id', dataAnggota.id); 
+
+  //     setLoading(false);
+
+
+  //     if (error) throw error;
+
+  //     setSnackBar(true);
+  //     setTimeout(() => {
+  //       setSnackBar(false);
+  //     }, 3000);
+  //   } catch (err) {
+  //     console.error('Error updating data:', err);
+  //   }
+  // };
 
   
 
@@ -253,9 +290,10 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
               <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="id">
                 <DatePicker
                   label="Tanggal Lahir"
-                  value={formData.tanggalLahir ? dayjs(formData.tanggalLahir) : null}
+                  value={formData.tanggalLahir}
                   onChange={handleDateChange}
                   name="tanggalLahir"
+                  renderInput={(params) => <TextField {...params} fullWidth />}
                 />
               </LocalizationProvider>
             </Grid>

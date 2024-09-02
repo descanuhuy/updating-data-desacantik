@@ -76,8 +76,6 @@ function DaftarDesa() {
         "Action"
       ]);
 
-    // console.log(desa_kelurahan);
-    
     setData(transformedData);
     setLoading(false);
         

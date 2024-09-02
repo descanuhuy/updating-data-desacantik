@@ -42,7 +42,6 @@ function StatusChart() {
       setLoading(true);
       const data = await Promise.all(statusLabels.map(status => fetchData(status)));
       setChartData(data);
-      console.log(chartData);
       
       setLoading(false);
     };

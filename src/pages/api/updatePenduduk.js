@@ -1,32 +1,59 @@
-import { supabase } from "./supabase";
+import { supabase } from './supabase';
 
 export default async function handler(req, res) {
   if (req.method === 'PUT') {
-    const { nomor_kk, sls } = req.body;
-
-    if (!nomor_kk || !sls) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
+    const {
+      id,
+      nomor_kk,
+      nik,
+      nama_kk,
+      nama_pddk,
+      jk,
+      tempat_lahir,
+      tgl_lahir,
+      agama,
+      pendidikan,
+      pekerjaan,
+      status_kawin,
+      shdk,
+      gol_darah,
+      status,
+      ayah,
+      ibu
+    } = req.body;
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('penduduks')
         .update({
-          kode_sls: sls.kode_sls,
-          wilayah_terkecil_id: sls.id
+          nomor_kk,
+          nik,
+          nama_kk,
+          nama_pddk,
+          jk,
+          tempat_lahir,
+          tgl_lahir,
+          agama,
+          pendidikan,
+          pekerjaan,
+          status_kawin,
+          shdk,
+          gol_darah,
+          status,
+          ayah,
+          ibu,
         })
-        .eq('nomor_kk', nomor_kk);
+        .eq('id', id);
 
       if (error) {
-        return res.status(500).json({ error: error.message });
+        throw error;
       }
 
-      res.status(200).json({ message: 'Update successful' });
-    } catch (err) {
-      res.status(500).json({ error: err.message });
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
     }
   } else {
-    res.setHeader('Allow', ['PUT']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+    res.status(405).json({ message: 'Method not allowed' });
   }
 }

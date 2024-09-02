@@ -26,8 +26,6 @@ const getKeluargas = async (noKK) => {
     .from('penduduks')
     .select('*')
     .eq('nomor_kk', noKK);
-    console.log(data);
-    
 
   if (error) {
     console.error('Error fetching data:', error);
