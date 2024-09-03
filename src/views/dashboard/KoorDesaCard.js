@@ -98,7 +98,8 @@ const KoorDesaCard = () => {
         penduduk: pendudukData.length,
       });
 
-      setNamaDesa(desa_kelurahan?.nama_desa || 'Unknown');
+      setNamaDesa(desa_kelurahan.nama_desa);
+      localStorage.setItem('nama_desa', desa_kelurahan.nama_desa);
       setLoading(false);
     };
 

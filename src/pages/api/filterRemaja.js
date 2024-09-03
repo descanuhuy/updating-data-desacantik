@@ -19,16 +19,13 @@ export default async function handler(req, res) {
     const response = await axios.request(options);
     const data = response.data.list;
 
-    // Define the boundary dates
     const now = new Date();
     const elevenYearsAgo = subYears(now, 11);
     const twentyFourYearsAgo = subYears(now, 24);
 
-    // Filter for individuals aged between 11 to 24 years old
     const filteredData = data.filter(item => {
       const birthDate = parseISO(item.tgl_lahir);
 
-      // Check if birthDate is between twenty-four years ago and eleven years ago
       return isAfter(birthDate, twentyFourYearsAgo) && isBefore(birthDate, elevenYearsAgo);
     });
 

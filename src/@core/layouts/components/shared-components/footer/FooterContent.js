@@ -15,10 +15,10 @@ const FooterContent = () => {
         <Box component='span' sx={{ color: 'error.main' }}>
           ❤️
         </Box>
-        {/* {` by `}
+        {` by `}
         <Link target='_blank' href='https://themeselection.com/'>
           Alfian Syarif - STIS 63
-        </Link> */}
+        </Link>
       </Typography>
       {/* {hidden ? null : (
         <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', '& :not(:last-child)': { mr: 4 } }}>

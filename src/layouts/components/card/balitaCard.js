@@ -1,42 +1,36 @@
-// ** MUI Imports
 import Card from '@mui/material/Card';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
-
-// ** Icons Imports
-import { Baby, BabyBottle } from 'mdi-material-ui';
-
-// ** React Imports
+import { ArmFlex, Baby } from 'mdi-material-ui';
 import { useEffect, useState } from 'react';
 import { supabase } from 'src/pages/api/supabase';
 import { CircularProgress } from '@mui/material';
 
 const getAgeRange = () => {
   const today = new Date();
-  const endDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate()); // End date for age 1
-  const startDate = new Date(today.getFullYear() - 5, today.getMonth(), today.getDate()); // Start date for age 4
+  const endDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+  const startDate = new Date(today.getFullYear() - 5, today.getMonth(), today.getDate());
   return { startDate, endDate };
 };
 
-
 const formatDate = (date) => {
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
   const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
 
 const downloadCSV = async (startDateStr, endDateStr) => {
   try {
     let allData = [];
-    let shouldFetchMore = true;
     let offset = 0;
     const limit = 1000;
+    let shouldFetchMore = true;
 
     while (shouldFetchMore) {
-      const { data, error } = await supabase
+      const { data, error, count } = await supabase
         .from('penduduks')
         .select(`
             nik,
@@ -46,7 +40,7 @@ const downloadCSV = async (startDateStr, endDateStr) => {
             ibu,
             tgl_lahir,
             wilayah_terkecil_id (nama_sls)
-          `)
+          `, { count: 'exact' })
         .gte('tgl_lahir', startDateStr)
         .lte('tgl_lahir', endDateStr)
         .range(offset, offset + limit - 1);
@@ -56,7 +50,8 @@ const downloadCSV = async (startDateStr, endDateStr) => {
       if (data.length > 0) {
         allData = allData.concat(data);
         offset += limit;
-        if (data.length < limit) {
+
+        if (data.length < limit || allData.length >= count) {
           shouldFetchMore = false;
         }
       } else {
@@ -69,10 +64,9 @@ const downloadCSV = async (startDateStr, endDateStr) => {
       return;
     }
 
-    // Generate CSV content
     const csvHeaders = ['nik', 'nama kepala keluarga', 'nama', 'nama ayah', 'nama ibu', 'tgl lahir', 'alamat'];
     const csvRows = [
-      csvHeaders.join(','), 
+      csvHeaders.join(','),
       ...allData.map(row => [
         row.nik || '',
         row.nama_kk || '',
@@ -89,7 +83,7 @@ const downloadCSV = async (startDateStr, endDateStr) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'balita_data.csv';
+    a.download = 'remaja_data.csv';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -99,42 +93,72 @@ const downloadCSV = async (startDateStr, endDateStr) => {
   }
 };
 
-const BalitaCard = () => {
-  const [balitaCount, setBalitaCount] = useState(0);
-  const [balitaData, setBalitaData] = useState([]);
+const RemajaCard = () => {
+  const [balitaCount, setbalitaCount] = useState(0);
   const [downloading, setDownloading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [namaDesa, setNamaDesa] = useState('');
+  const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
     setLoading(true);
     const kodeKec = localStorage.getItem('kode_kec');
     const kodeDesa = localStorage.getItem('kode_desa');
-    const fetchBalitaData = async () => {
+    const namaDesa = localStorage.getItem('nama_desa');
+    const role = localStorage.getItem('role'); 
+
+    setUserRole(role);
+    setNamaDesa(namaDesa);
+
+    const fetchRemajaData = async () => {
       try {
         const { startDate, endDate } = getAgeRange();
         const startDateStr = formatDate(startDate);
         const endDateStr = formatDate(endDate);
 
-        const { data, error } = await supabase
-          .from('penduduks')
-          .select('nik, nama_kk, nama_pddk, ayah, ibu, tgl_lahir')
-          .gte('tgl_lahir', startDateStr)
-          .lte('tgl_lahir', endDateStr)
-          .eq('kode_kec', kodeKec) 
-          .eq('kode_desa', kodeDesa) 
+        let allData = [];
+        let offset = 0;
+        const limit = 1000;
+        let shouldFetchMore = true;
 
-        if (error) {
-          throw error;
+        const query = supabase
+          .from('penduduks')
+          .select('nik, nama_kk, nama_pddk, ayah, ibu, tgl_lahir', { count: 'exact' })
+          .eq('kode_kec', kodeKec)
+          .gte('tgl_lahir', startDateStr)
+          .lte('tgl_lahir', endDateStr);
+
+        // Add kodeDesa condition if it's not empty
+        if (kodeDesa && role !== 'koor_kec' && role !== 'enum_kec') {
+          query.eq('kode_desa', kodeDesa);
         }
-        setBalitaCount(data.length);
-        setBalitaData(data);   
+
+        while (shouldFetchMore) {
+          const { data, error, count } = await query.range(offset, offset + limit - 1);
+
+          if (error) {
+            throw error;
+          }
+
+          if (data.length > 0) {
+            allData = allData.concat(data);
+            offset += limit;
+            if (data.length < limit || offset >= count) {
+              shouldFetchMore = false;
+            }
+          } else {
+            shouldFetchMore = false;
+          }
+        }
+
+        setbalitaCount(allData.length);
       } catch (error) {
         console.error('Error fetching penduduks data:', error);
       }
       setLoading(false);
     };
 
-    fetchBalitaData();
+    fetchRemajaData();
   }, []);
 
   const { startDate, endDate } = getAgeRange();
@@ -143,31 +167,31 @@ const BalitaCard = () => {
 
   return (
     <Card>
-     
-      
       <CardContent
-      sx={{
-        display: 'flex',
-        textAlign: 'center',
-        alignItems: 'center',
-        flexDirection: 'column',
-        padding: theme => `${theme.spacing(9.75, 5, 9.25)} !important`
+        sx={{
+          display: 'flex',
+          textAlign: 'center',
+          alignItems: 'center',
+          flexDirection: 'column',
+          padding: theme => `${theme.spacing(9.75, 5, 9.25)} !important`
         }}
-        >
+      >
         {loading ? (<>
           <CircularProgress />
-        </>) : 
-        (<>
+        </>) : (<>
+        
         <Avatar
           sx={{ width: 50, height: 50, marginBottom: 2.25, color: 'common.white', backgroundColor: 'primary.main' }}
-          >
+        >
           <Baby sx={{ fontSize: '2rem' }} />
         </Avatar>
         <Typography variant='h6' sx={{ marginBottom: 2.75 }}>
           Balita
         </Typography>
         <Typography variant='body2' sx={{ marginBottom: 6 }}>
-          Terdapat {balitaCount} penduduk Balita di Desa Plumpang
+          {userRole === 'koor_kec' || userRole === 'enum_kec'
+            ? `Terdapat ${balitaCount} penduduk Balita di kecamatan ini.`
+            : `Terdapat ${balitaCount} penduduk Balita di Desa ${namaDesa}.`}
         </Typography>
         <Button 
           variant='contained' 
@@ -186,4 +210,4 @@ const BalitaCard = () => {
   );
 };
 
-export default BalitaCard;
+export default RemajaCard;

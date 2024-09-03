@@ -8,7 +8,6 @@ import { useEffect, useState } from 'react';
 import { supabase } from 'src/pages/api/supabase';
 import { CircularProgress } from '@mui/material';
 
-
 const getAgeRange = () => {
   const today = new Date();
   const endDate = new Date(today.getFullYear() - 10, today.getMonth(), today.getDate());
@@ -98,37 +97,49 @@ const RemajaCard = () => {
   const [remajaCount, setRemajaCount] = useState(0);
   const [downloading, setDownloading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [namaDesa, setNamaDesa] = useState('');
+  const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
     setLoading(true);
     const kodeKec = localStorage.getItem('kode_kec');
     const kodeDesa = localStorage.getItem('kode_desa');
+    const role = localStorage.getItem('role'); 
+    const namaDesa = localStorage.getItem('nama_desa');
+
+    setUserRole(role);
+    setNamaDesa(namaDesa);
 
     const fetchRemajaData = async () => {
       try {
         const { startDate, endDate } = getAgeRange();
         const startDateStr = formatDate(startDate);
         const endDateStr = formatDate(endDate);
-  
+
         let allData = [];
         let offset = 0;
         const limit = 1000;
         let shouldFetchMore = true;
-  
+
+        const query = supabase
+          .from('penduduks')
+          .select('nik, nama_kk, nama_pddk, ayah, ibu, tgl_lahir', { count: 'exact' })
+          .eq('kode_kec', kodeKec)
+          .gte('tgl_lahir', startDateStr)
+          .lte('tgl_lahir', endDateStr);
+
+        // Add kodeDesa condition if it's not empty
+        if (kodeDesa && role !== 'koor_kec' && role !== 'enum_kec') {
+          query.eq('kode_desa', kodeDesa);
+        }
+
         while (shouldFetchMore) {
-          const { data, error, count } = await supabase
-            .from('penduduks')
-            .select('nik, nama_kk, nama_pddk, ayah, ibu, tgl_lahir', { count: 'exact' })
-            .eq('kode_kec', kodeKec) 
-            .eq('kode_desa', kodeDesa) 
-            .gte('tgl_lahir', startDateStr)
-            .lte('tgl_lahir', endDateStr)
-            .range(offset, offset + limit - 1);
-  
+          const { data, error, count } = await query.range(offset, offset + limit - 1);
+
           if (error) {
             throw error;
           }
-  
+
           if (data.length > 0) {
             allData = allData.concat(data);
             offset += limit;
@@ -139,18 +150,16 @@ const RemajaCard = () => {
             shouldFetchMore = false;
           }
         }
-  
+
         setRemajaCount(allData.length);
-        setRemajaData(allData);
       } catch (error) {
         console.error('Error fetching penduduks data:', error);
       }
       setLoading(false);
     };
-  
+
     fetchRemajaData();
   }, []);
-  
 
   const { startDate, endDate } = getAgeRange();
   const startDateStr = formatDate(startDate);
@@ -180,7 +189,9 @@ const RemajaCard = () => {
           Remaja
         </Typography>
         <Typography variant='body2' sx={{ marginBottom: 6 }}>
-          Terdapat {remajaCount} penduduk Remaja di Desa Plumpang
+          {userRole === 'koor_kec' || userRole === 'enum_kec'
+            ? `Terdapat ${remajaCount} penduduk Remaja di kecamatan ini.`
+            : `Terdapat ${remajaCount} penduduk Remaja di Desa ${namaDesa}.`}
         </Typography>
         <Button 
           variant='contained' 
