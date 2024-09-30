@@ -324,6 +324,7 @@ const ModalEditAnggota = ({ open, handleClose, dataAnggota }) => {
                   id="pendidikan-select"
                   value={formData.pendidikan}
                   label="Pendidikan"
+                  onChange={handleChange}
                 >
                   {pendidikanList.map((item, index) => (
                     <MenuItem key={index} value={item}>{item}</MenuItem>
